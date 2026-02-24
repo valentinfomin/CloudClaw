@@ -37,8 +37,8 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Telegram Webhook Handler' (Protocol in workflow.md)
 
 ## Phase 4: Deployment & Verification
-- [ ] Task: Deploy to Cloudflare Workers.
+- [~] Task: Deploy to Cloudflare Workers.
     - [ ] Sub-task: Run `npx wrangler deploy`.
-- [ ] Task: Set Telegram Webhook.
+- [~] Task: Set Telegram Webhook.
     - [ ] Sub-task: Create a script or simple curl command instruction to set the webhook URL to the deployed worker.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Deployment & Verification' (Protocol in workflow.md)
