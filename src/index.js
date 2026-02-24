@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { authMiddleware } from './middleware/auth.js';
 import { handleUpdate } from './handlers/commands.js';
 
+console.log("Worker Script Loaded");
+
 const app = new Hono();
 
 // Re-enable authentication middleware using the new TG_TOKEN secret

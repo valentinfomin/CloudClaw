@@ -12,7 +12,12 @@ export async function handleUpdate(c, update) {
     if (!message) return c.json({ ok: true });
 
     // Trim token to avoid accidental newlines/spaces
-    const token = env.TG_TOKEN.trim();
+    const token = env.TG_TOKEN ? env.TG_TOKEN.trim() : '';
+
+    if (!token) {
+        console.error("TG_TOKEN is missing!");
+        return c.json({ ok: false, error: "Missing token" });
+    }
 
     const chat_id = String(message.chat.id);
     const user = {
@@ -76,6 +81,7 @@ export async function handleUpdate(c, update) {
         if (!message.text) return c.json({ ok: true });
         const text = message.text;
 
+        console.log(`--- User Message: ${text} ---`);
         await logMessage(env.DB, { chat_id, role: 'user', content: text });
 
         if (text.startsWith('/')) {
@@ -84,26 +90,39 @@ export async function handleUpdate(c, update) {
 
         console.log("--- 2. Fetching History ---");
         const history = await getChatHistory(env.DB, chat_id, 10);
+        console.log(`--- History Length: ${history.length} ---`);
 
         console.log("--- 3. Calling Workers AI ---");
+        const messages = [
+            { role: 'system', content: 'You are CloudClaw, a smart assistant.' },
+            ...history.map(h => ({ role: h.role, content: h.content }))
+        ];
+        
+        console.log(`--- AI Input Messages: ${JSON.stringify(messages)} ---`);
+
         const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-            messages: [
-                { role: 'system', content: 'You are CloudClaw, a smart assistant.' },
-                ...history.map(h => ({ role: h.role, content: h.content }))
-            ]
+            messages
         });
 
-        const botReply = aiResponse.response || aiResponse.text;
+        console.log(`--- AI Response Raw: ${JSON.stringify(aiResponse)} ---`);
 
-        console.log("--- 4. Sending to Telegram ---");
+        // Some models return 'response', others 'text'. Let's check both.
+        const botReply = aiResponse.response || aiResponse.text || "[No response from AI]";
+
+        console.log(`--- 4. Sending to Telegram: ${botReply} ---`);
         await sendMessage(token, chat_id, botReply);
         await logMessage(env.DB, { chat_id, role: 'assistant', content: botReply });
 
         console.log("--- DONE ---");
 
     } catch (err) {
-        console.error("ERROR IN HANDLER:", err.message);
-        await sendMessage(token, chat_id, "Bot Error: " + err.message);
+        console.error("ERROR IN HANDLER:", err);
+        // Try to send error to user
+        try {
+            await sendMessage(token, chat_id, "Bot Error: " + err.message);
+        } catch (sendErr) {
+            console.error("Failed to send error message:", sendErr);
+        }
     }
 
     return c.json({ ok: true });
