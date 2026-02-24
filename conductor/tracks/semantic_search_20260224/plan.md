@@ -14,13 +14,13 @@
     - [x] Sub-task: Write integration tests for vector search (mocking binding).
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Vector Search & Retrieval' (Protocol in workflow.md)
 
-## Phase 3: RAG Integration
-- [~] Task: Augment AI Prompt.
-    - [ ] Sub-task: Update `handleUpdate` in `src/handlers/commands.js` to fetch semantic context before calling LLM.
-    - [ ] Sub-task: Format context and inject into the system message.
-- [ ] Task: Verify RAG Accuracy.
-    - [ ] Sub-task: Test bot's "Long-term Memory" with specific facts.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: RAG Integration' (Protocol in workflow.md)
+## Phase 3: RAG Integration [checkpoint: 4c71736]
+- [x] Task: Augment AI Prompt.
+    - [x] Sub-task: Update `handleUpdate` in `src/handlers/commands.js` to fetch semantic context before calling LLM.
+    - [x] Sub-task: Format context and inject into the system message.
+- [x] Task: Verify RAG Accuracy.
+    - [x] Sub-task: Test bot's "Long-term Memory" with specific facts.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: RAG Integration' (Protocol in workflow.md)
 
 ## Phase 4: Deployment & Finalization
 - [ ] Task: Deploy.
