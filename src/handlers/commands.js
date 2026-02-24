@@ -1,23 +1,70 @@
 // src/handlers/commands.js
 import { createUser } from '../db/users.js';
 import { logMessage, getChatHistory } from '../db/messages.js';
+import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
+import { uploadFile } from '../services/storage.js';
+import { createFile } from '../db/files.js';
 
 export async function handleUpdate(c, update) {
     const env = c.env;
     const message = update.message;
 
-    if (!message || !message.text) return c.json({ ok: true });
+    if (!message) return c.json({ ok: true });
 
     const chat_id = String(message.chat.id);
-    const text = message.text;
+    const user = {
+        chat_id,
+        username: message.from?.username,
+        first_name: message.from?.first_name
+    };
 
     try {
-        console.log("--- 1. Saving to DB ---");
-        await createUser(env.DB, {
-            chat_id,
-            username: message.from?.username,
-            first_name: message.from?.first_name
-        });
+        console.log("--- 1. Saving User ---");
+        await createUser(env.DB, user);
+
+        // Handle File (Document or Photo)
+        if (message.document || message.photo) {
+            console.log("--- Handling File ---");
+            let fileId, fileName, mimeType, fileSize;
+
+            if (message.document) {
+                fileId = message.document.file_id;
+                fileName = message.document.file_name;
+                mimeType = message.document.mime_type;
+                fileSize = message.document.file_size;
+            } else if (message.photo) {
+                // Photos come in array, last one is highest res
+                const photo = message.photo[message.photo.length - 1];
+                fileId = photo.file_id;
+                fileName = `photo_${fileId}.jpg`;
+                mimeType = 'image/jpeg';
+                fileSize = photo.file_size;
+            }
+
+            const fileInfo = await getFileInfo(env.TG_TOKEN, fileId);
+            const content = await downloadFile(env.TG_TOKEN, fileInfo.file_path);
+
+            const timestamp = Date.now();
+            const r2Key = `${chat_id}/${timestamp}_${fileName}`;
+
+            await uploadFile(env.FILES, r2Key, content, mimeType);
+
+            await createFile(env.DB, {
+                user_id: chat_id,
+                r2_key: r2Key,
+                filename: fileName,
+                content_type: mimeType,
+                size: fileSize
+            });
+
+            await sendMessage(env.TG_TOKEN, chat_id, `File uploaded successfully: ${fileName}`);
+            return c.json({ ok: true });
+        }
+
+        // Handle Text
+        if (!message.text) return c.json({ ok: true });
+        const text = message.text;
+
         await logMessage(env.DB, { chat_id, role: 'user', content: text });
 
         if (text.startsWith('/')) {
@@ -39,15 +86,14 @@ export async function handleUpdate(c, update) {
         const botReply = aiResponse.response || aiResponse.text;
 
         console.log("--- 4. Sending to Telegram ---");
-        await sendMessage(env.TELEGRAM_TOKEN, chat_id, botReply);
+        await sendMessage(env.TG_TOKEN, chat_id, botReply);
         await logMessage(env.DB, { chat_id, role: 'assistant', content: botReply });
 
         console.log("--- DONE ---");
 
     } catch (err) {
         console.error("ERROR IN HANDLER:", err.message);
-        // This will help us see the error in the chat
-        await sendMessage(env.TELEGRAM_TOKEN, chat_id, "Bot Error: " + err.message);
+        await sendMessage(env.TG_TOKEN, chat_id, "Bot Error: " + err.message);
     }
 
     return c.json({ ok: true });
@@ -56,14 +102,8 @@ export async function handleUpdate(c, update) {
 async function handleCommand(c, chat_id, text) {
     let reply = "I am CloudClaw AI.";
     if (text === '/start') reply = "Hi! I am ready to talk.";
-    await sendMessage(c.env.TELEGRAM_TOKEN, chat_id, reply);
+    else if (text === '/status') reply = "CloudClaw is online.";
+    
+    await sendMessage(c.env.TG_TOKEN, chat_id, reply);
     return c.json({ ok: true });
-}
-
-async function sendMessage(token, chat_id, text) {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id, text })
-    });
 }
