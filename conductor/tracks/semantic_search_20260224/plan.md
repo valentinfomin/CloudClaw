@@ -1,12 +1,12 @@
 # Implementation Plan - Semantic Search & RAG
 
-## Phase 1: Embedding Service & Indexing
-- [~] Task: Implement Embedding Logic.
-    - [ ] Sub-task: Create `src/services/ai.js` with `generateEmbedding` function.
-    - [ ] Sub-task: Write unit tests for embedding generation.
-- [ ] Task: Integrate Indexing into Message Flow.
-    - [ ] Sub-task: Update `src/handlers/commands.js` to generate and store a vector for every incoming message.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Embedding Service & Indexing' (Protocol in workflow.md)
+## Phase 1: Embedding Service & Indexing [checkpoint: b5c3279]
+- [x] Task: Implement Embedding Logic.
+    - [x] Sub-task: Create `src/services/ai.js` with `generateEmbedding` function.
+    - [x] Sub-task: Write unit tests for embedding generation.
+- [x] Task: Integrate Indexing into Message Flow.
+    - [x] Sub-task: Update `src/handlers/commands.js` to generate and store a vector for every incoming message.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Embedding Service & Indexing' (Protocol in workflow.md)
 
 ## Phase 2: Vector Search & Retrieval
 - [ ] Task: Implement Search Service.
