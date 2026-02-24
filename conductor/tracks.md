@@ -12,3 +12,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Debug and fix AI response issue in Telegram Bot**
   *Link: [./tracks/debug_ai_20260224/](./tracks/debug_ai_20260224/)*
+
+- [ ] **Track: Implement Semantic Search and RAG with Cloudflare Vectorize**
+  *Link: [./tracks/semantic_search_20260224/](./tracks/semantic_search_20260224/)*
