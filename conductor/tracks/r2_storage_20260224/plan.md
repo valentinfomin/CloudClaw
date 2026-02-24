@@ -10,7 +10,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Database Schema & DAL' (Protocol in workflow.md)
 
 ## Phase 2: R2 Storage Logic
-- [ ] Task: Implement R2 Service.
+- [~] Task: Implement R2 Service.
     - [ ] Sub-task: Create `src/services/storage.js` to handle `put` and `get` operations on R2 binding.
     - [ ] Sub-task: Write integration tests (mocking R2 binding) for storage service.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: R2 Storage Logic' (Protocol in workflow.md)
