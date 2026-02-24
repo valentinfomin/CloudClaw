@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Implement Voice-to-Text Transcription with Cloudflare Workers AI (Whisper)**
+- [~] **Track: Implement Voice-to-Text Transcription with Cloudflare Workers AI (Whisper)**
   *Link: [./tracks/voice_transcription_20260224/](./tracks/voice_transcription_20260224/)*

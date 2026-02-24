@@ -1,13 +1,13 @@
 # Implementation Plan - Voice-to-Text Transcription
 
-## Phase 1: Transcription Service
-- [ ] Task: Implement Transcription Logic.
-    - [ ] Sub-task: Update `src/services/ai.js` to include a `transcribeAudio` function using `@cf/openai/whisper`.
-    - [ ] Sub-task: Write unit tests for transcription (mocking AI binding).
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Transcription Service' (Protocol in workflow.md)
+## Phase 1: Transcription Service [checkpoint: 613f752]
+- [x] Task: Implement Transcription Logic.
+    - [x] Sub-task: Update `src/services/ai.js` to include a `transcribeAudio` function using `@cf/openai/whisper`.
+    - [x] Sub-task: Write unit tests for transcription (mocking AI binding).
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Transcription Service' (Protocol in workflow.md)
 
 ## Phase 2: Bot Integration
-- [ ] Task: Handle Voice Updates.
+- [~] Task: Handle Voice Updates.
     - [ ] Sub-task: Update `src/handlers/commands.js` to detect `message.voice`.
     - [ ] Sub-task: Implement the voice-to-text-to-reasoning flow.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Bot Integration' (Protocol in workflow.md)

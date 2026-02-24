@@ -19,3 +19,15 @@ export async function runChat(ai, model, messages) {
     const response = await ai.run(model, { messages });
     return response.response || response.text || "";
 }
+
+export async function transcribeAudio(ai, audioBuffer) {
+    const response = await ai.run('@cf/openai/whisper', {
+        audio: [...new Uint8Array(audioBuffer)]
+    });
+    
+    if (!response.text) {
+        throw new Error('Failed to transcribe audio: No text returned');
+    }
+    
+    return response.text;
+}
