@@ -43,7 +43,7 @@ describe('Telegram Webhook', () => {
 
         const res = await app.fetch(req, mockEnv);
         expect(res.status).toBe(200);
-        expect(await res.text()).toBe('OK');
+        expect(await res.json()).toEqual({ ok: true });
         
         // Verify DB calls
         expect(mockEnv.DB.prepare).toHaveBeenCalled(); // Should call createUser and logMessage

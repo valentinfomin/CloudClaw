@@ -1,10 +1,10 @@
 # Implementation Plan - R2 File Storage Integration
 
 ## Phase 1: Database Schema & DAL
-- [ ] Task: Define File Schema.
-    - [ ] Sub-task: Create migration `migrations/0002_files_table.sql` creating the `files` table.
-    - [ ] Sub-task: Apply migration locally and remote.
-- [ ] Task: Implement Files DAL.
+- [x] Task: Define File Schema.
+    - [x] Sub-task: Create migration `migrations/0002_files_table.sql` creating the `files` table.
+    - [x] Sub-task: Apply migration locally and remote.
+- [~] Task: Implement Files DAL.
     - [ ] Sub-task: Create `src/db/files.js` with `createFile` and `listFiles` functions.
     - [ ] Sub-task: Write unit tests for Files DAL.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Schema & DAL' (Protocol in workflow.md)
