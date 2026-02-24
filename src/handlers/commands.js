@@ -3,7 +3,7 @@ import { createUser } from '../db/users.js';
 import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
 import { uploadFile } from '../services/storage.js';
-import { createFile } from '../db/files.js';
+import { createFile, listFiles } from '../db/files.js';
 
 export async function handleUpdate(c, update) {
     const env = c.env;
@@ -101,8 +101,23 @@ export async function handleUpdate(c, update) {
 
 async function handleCommand(c, chat_id, text) {
     let reply = "I am CloudClaw AI.";
-    if (text === '/start') reply = "Hi! I am ready to talk.";
-    else if (text === '/status') reply = "CloudClaw is online.";
+    
+    if (text === '/start') {
+        reply = "Hi! I am ready to talk.";
+    } else if (text === '/status') {
+        reply = "CloudClaw is online.";
+    } else if (text === '/files') {
+        const files = await listFiles(c.env.DB, chat_id);
+        if (files.length === 0) {
+            reply = "You have no uploaded files.";
+        } else {
+            reply = "Your files:\n" + files.map(f => `- ${f.filename} (ID: ${f.id})`).join('\n');
+            reply += "\n\nUse /get <id> to retrieve a file.";
+        }
+    } else if (text.startsWith('/get ')) {
+        const fileId = text.split(' ')[1];
+        reply = `Request to get file ID: ${fileId} received. (Feature pending)`;
+    }
     
     await sendMessage(c.env.TG_TOKEN, chat_id, reply);
     return c.json({ ok: true });

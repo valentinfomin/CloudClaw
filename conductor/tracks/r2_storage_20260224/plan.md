@@ -24,7 +24,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Telegram File Handling' (Protocol in workflow.md)
 
 ## Phase 4: Retrieval & Deployment
-- [ ] Task: Implement Retrieval Commands.
+- [~] Task: Implement Retrieval Commands.
     - [ ] Sub-task: Implement `/files` command to list files from D1.
     - [ ] Sub-task: Implement `/get <file_id>` (or similar) to retrieve file from R2 and send to user.
 - [ ] Task: Deploy.
