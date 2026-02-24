@@ -9,17 +9,17 @@
     - [x] Sub-task: Ensure `compatibility_date` is set.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Project Scaffolding & Configuration' (Protocol in workflow.md)
 
-## Phase 2: D1 Database Setup
-- [~] Task: Define Database Schema.
-    - [ ] Sub-task: Create SQL migration file `migrations/0001_initial.sql` creating `users` and `messages` tables.
-    - [ ] Sub-task: Write tests for schema application (using Miniflare/Wrangler local).
-    - [ ] Sub-task: Apply migration locally and remote.
-- [~] Task: Implement D1 Data Access Layer (DAL).
-    - [ ] Sub-task: Create `src/db/schema.js` (or types).
-    - [ ] Sub-task: Create `src/db/users.js` with `createUser` and `getUser` functions.
-    - [ ] Sub-task: Create `src/db/messages.js` with `logMessage` function.
-    - [ ] Sub-task: Write unit tests for DAL functions mocking the D1 binding.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: D1 Database Setup' (Protocol in workflow.md)
+## Phase 2: D1 Database Setup [checkpoint: 7e49685]
+- [x] Task: Define Database Schema.
+    - [x] Sub-task: Create SQL migration file `migrations/0001_initial.sql` creating `users` and `messages` tables.
+    - [x] Sub-task: Write tests for schema application (using Miniflare/Wrangler local).
+    - [x] Sub-task: Apply migration locally and remote.
+- [x] Task: Implement D1 Data Access Layer (DAL).
+    - [x] Sub-task: Create `src/db/schema.js` (or types).
+    - [x] Sub-task: Create `src/db/users.js` with `createUser` and `getUser` functions.
+    - [x] Sub-task: Create `src/db/messages.js` with `logMessage` function.
+    - [x] Sub-task: Write unit tests for DAL functions mocking the D1 binding.
+- [x] Task: Conductor - User Manual Verification 'Phase 2: D1 Database Setup' (Protocol in workflow.md)
 
 ## Phase 3: Telegram Webhook Handler
 - [ ] Task: Implement Webhook Security & Parsing.
