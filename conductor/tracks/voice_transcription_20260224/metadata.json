@@ -1,0 +1,8 @@
+{
+  "track_id": "voice_transcription_20260224",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-24T16:00:00Z",
+  "updated_at": "2026-02-24T16:00:00Z",
+  "description": "Implement Voice-to-Text Transcription with Cloudflare Workers AI (Whisper)"
+}
