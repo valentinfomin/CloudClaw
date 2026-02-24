@@ -7,5 +7,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Implement core Telegram Bot infrastructure and D1 database integration**
   *Link: [./tracks/core_telegram_d1_20260224/](./tracks/core_telegram_d1_20260224/)*
 
-- [~] **Track: Implement File Storage with Cloudflare R2 and Telegram Integration**
+- [x] **Track: Implement File Storage with Cloudflare R2 and Telegram Integration**
   *Link: [./tracks/r2_storage_20260224/](./tracks/r2_storage_20260224/)*
