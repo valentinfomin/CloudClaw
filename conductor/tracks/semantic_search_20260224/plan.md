@@ -8,11 +8,11 @@
     - [x] Sub-task: Update `src/handlers/commands.js` to generate and store a vector for every incoming message.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Embedding Service & Indexing' (Protocol in workflow.md)
 
-## Phase 2: Vector Search & Retrieval
-- [~] Task: Implement Search Service.
-    - [ ] Sub-task: Create `src/services/vector.js` to query `VECTOR_INDEX` and filter by `chat_id`.
-    - [ ] Sub-task: Write integration tests for vector search (mocking binding).
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Vector Search & Retrieval' (Protocol in workflow.md)
+## Phase 2: Vector Search & Retrieval [checkpoint: 69596f7]
+- [x] Task: Implement Search Service.
+    - [x] Sub-task: Create `src/services/vector.js` to query `VECTOR_INDEX` and filter by `chat_id`.
+    - [x] Sub-task: Write integration tests for vector search (mocking binding).
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Vector Search & Retrieval' (Protocol in workflow.md)
 
 ## Phase 3: RAG Integration
 - [ ] Task: Augment AI Prompt.
