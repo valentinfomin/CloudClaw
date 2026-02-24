@@ -10,11 +10,11 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Project Scaffolding & Configuration' (Protocol in workflow.md)
 
 ## Phase 2: D1 Database Setup
-- [ ] Task: Define Database Schema.
+- [~] Task: Define Database Schema.
     - [ ] Sub-task: Create SQL migration file `migrations/0001_initial.sql` creating `users` and `messages` tables.
     - [ ] Sub-task: Write tests for schema application (using Miniflare/Wrangler local).
     - [ ] Sub-task: Apply migration locally and remote.
-- [ ] Task: Implement D1 Data Access Layer (DAL).
+- [~] Task: Implement D1 Data Access Layer (DAL).
     - [ ] Sub-task: Create `src/db/schema.js` (or types).
     - [ ] Sub-task: Create `src/db/users.js` with `createUser` and `getUser` functions.
     - [ ] Sub-task: Create `src/db/messages.js` with `logMessage` function.
