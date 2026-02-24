@@ -4,7 +4,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Implement Document Parsing and RAG for uploaded R2 files**
+- [~] **Track: Implement Document Parsing and RAG for uploaded R2 files**
   *Link: [./tracks/document_rag_20260224/](./tracks/document_rag_20260224/)*
 
 - [x] **Track: Implement Voice-to-Text Transcription with Cloudflare Workers AI (Whisper)**

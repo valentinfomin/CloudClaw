@@ -1,7 +1,7 @@
 # Implementation Plan - Document Parsing & RAG
 
 ## Phase 1: Text Extraction Service
-- [ ] Task: Implement Text Extractor.
+- [~] Task: Implement Text Extractor.
     - [ ] Sub-task: Create `src/services/extractor.js` to handle different MIME types.
     - [ ] Sub-task: Implement plain text extractor.
     - [ ] Sub-task: Implement basic PDF text extractor (or integration).
