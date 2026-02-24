@@ -9,7 +9,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Embedding Service & Indexing' (Protocol in workflow.md)
 
 ## Phase 2: Vector Search & Retrieval
-- [ ] Task: Implement Search Service.
+- [~] Task: Implement Search Service.
     - [ ] Sub-task: Create `src/services/vector.js` to query `VECTOR_INDEX` and filter by `chat_id`.
     - [ ] Sub-task: Write integration tests for vector search (mocking binding).
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Vector Search & Retrieval' (Protocol in workflow.md)
