@@ -5,6 +5,7 @@ import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js'
 import { uploadFile } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
 import { generateEmbedding, runChat } from '../services/ai.js';
+import { semanticSearch } from '../services/vector.js';
 
 export async function handleUpdate(c, update) {
     const env = c.env;
@@ -42,7 +43,6 @@ export async function handleUpdate(c, update) {
                 mimeType = message.document.mime_type;
                 fileSize = message.document.file_size;
             } else if (message.photo) {
-                // Photos come in array, last one is highest res
                 const photo = message.photo[message.photo.length - 1];
                 fileId = photo.file_id;
                 fileName = `photo_${fileId}.jpg`;
@@ -77,38 +77,62 @@ export async function handleUpdate(c, update) {
         console.log(`--- User Message: ${text} ---`);
         const messageId = await logMessage(env.DB, { chat_id, role: 'user', content: text });
 
-        // Index Message
+        // Generate embedding once to reuse for indexing and search
+        let currentVector = null;
         try {
+            currentVector = await generateEmbedding(env.AI, text);
+            
+            // Index Message
             console.log("--- Indexing Message ---");
-            const vector = await generateEmbedding(env.AI, text);
             await env.VECTOR_INDEX.upsert([
                 {
                     id: `msg_${messageId}`,
-                    values: vector,
+                    values: currentVector,
                     metadata: { chat_id, message_id: messageId, role: 'user', content: text }
                 }
             ]);
         } catch (idxErr) {
             console.error("FAILED TO INDEX MESSAGE:", idxErr.message);
-            // Don't fail the whole request if indexing fails
         }
 
         if (text.startsWith('/')) {
             return await handleCommand(c, chat_id, text, token);
         }
 
-        console.log("--- 2. Fetching History ---");
+        console.log("--- 2. Fetching Semantic Context (RAG) ---");
+        let semanticContext = "";
+        if (currentVector) {
+            try {
+                const matches = await semanticSearch(env.VECTOR_INDEX, currentVector, chat_id);
+                if (matches.length > 0) {
+                    semanticContext = "Here is some relevant context from past conversations:\n";
+                    matches.forEach(m => {
+                        if (m.metadata?.content) {
+                            semanticContext += `- ${m.metadata.content}\n`;
+                        }
+                    });
+                }
+            } catch (ragErr) {
+                console.error("FAILED TO FETCH SEMANTIC CONTEXT:", ragErr.message);
+            }
+        }
+
+        console.log("--- 3. Fetching Recent History ---");
         const history = await getChatHistory(env.DB, chat_id, 10);
 
-        console.log("--- 3. Calling Workers AI ---");
+        console.log("--- 4. Calling Workers AI ---");
+        const systemPrompt = `You are CloudClaw, a smart assistant. 
+${semanticContext ? `\n${semanticContext}` : ''}
+Use the provided context to answer more accurately if relevant.`;
+
         const messages = [
-            { role: 'system', content: 'You are CloudClaw, a smart assistant.' },
+            { role: 'system', content: systemPrompt },
             ...history.map(h => ({ role: h.role, content: h.content }))
         ];
 
         const botReply = await runChat(env.AI, '@cf/meta/llama-3-8b-instruct', messages);
 
-        console.log(`--- 4. Sending to Telegram ---`);
+        console.log(`--- 5. Sending to Telegram ---`);
         await sendMessage(token, chat_id, botReply || "[No response from AI]");
         
         const assistantMsgId = await logMessage(env.DB, { chat_id, role: 'assistant', content: botReply });

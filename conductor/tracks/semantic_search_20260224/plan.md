@@ -15,7 +15,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Vector Search & Retrieval' (Protocol in workflow.md)
 
 ## Phase 3: RAG Integration
-- [ ] Task: Augment AI Prompt.
+- [~] Task: Augment AI Prompt.
     - [ ] Sub-task: Update `handleUpdate` in `src/handlers/commands.js` to fetch semantic context before calling LLM.
     - [ ] Sub-task: Format context and inject into the system message.
 - [ ] Task: Verify RAG Accuracy.
