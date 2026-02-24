@@ -3,7 +3,8 @@
 export async function logMessage(db, message) {
     const { chat_id, role, content } = message;
     const query = 'INSERT INTO messages (chat_id, role, content) VALUES (?, ?, ?)';
-    return await db.prepare(query).bind(String(chat_id), role, content).run();
+    const result = await db.prepare(query).bind(String(chat_id), role, content).run();
+    return result.meta.last_row_id;
 }
 
 /**

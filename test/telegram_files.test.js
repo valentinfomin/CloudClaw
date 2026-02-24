@@ -19,6 +19,7 @@ describe('Telegram File Service', () => {
     it('downloadFile should fetch file content', async () => {
         const mockBuffer = new ArrayBuffer(8);
         const mockFetch = vi.fn().mockResolvedValue({
+            ok: true,
             arrayBuffer: () => Promise.resolve(mockBuffer)
         });
         global.fetch = mockFetch;

@@ -7,9 +7,11 @@ describe('Telegram Webhook', () => {
         DB: {
             prepare: vi.fn().mockReturnThis(),
             bind: vi.fn().mockReturnThis(),
-            run: vi.fn(),
+            run: vi.fn().mockResolvedValue({ meta: { last_row_id: 1 } }),
             first: vi.fn()
-        }
+        },
+        AI: { run: vi.fn().mockResolvedValue({ data: [[0.1, 0.2]] }) },
+        VECTOR_INDEX: { upsert: vi.fn().mockResolvedValue({}) }
     };
 
     it('should return 401 for unauthorized requests', async () => {

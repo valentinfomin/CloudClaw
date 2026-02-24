@@ -16,11 +16,14 @@ describe('File Retrieval Commands', () => {
         DB: {
             prepare: vi.fn().mockReturnThis(),
             bind: vi.fn().mockReturnThis(),
-            run: vi.fn(),
+            run: vi.fn().mockResolvedValue({ meta: { last_row_id: 1 } }),
             all: vi.fn()
         },
         FILES: { put: vi.fn() },
-        AI: { run: vi.fn() }
+        VECTOR_INDEX: { upsert: vi.fn().mockResolvedValue({}) },
+        AI: { 
+            run: vi.fn().mockResolvedValue({ data: [[0.1, 0.2]] }) 
+        }
     };
 
     it('should list files on /files command', async () => {

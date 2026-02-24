@@ -1,7 +1,7 @@
 # Implementation Plan - Semantic Search & RAG
 
 ## Phase 1: Embedding Service & Indexing
-- [ ] Task: Implement Embedding Logic.
+- [~] Task: Implement Embedding Logic.
     - [ ] Sub-task: Create `src/services/ai.js` with `generateEmbedding` function.
     - [ ] Sub-task: Write unit tests for embedding generation.
 - [ ] Task: Integrate Indexing into Message Flow.

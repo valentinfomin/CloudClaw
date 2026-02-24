@@ -31,14 +31,15 @@ describe('D1 Data Access Layer', () => {
     });
 
     describe('Messages', () => {
-        it('logMessage should insert a message', async () => {
+        it('logMessage should insert a message and return last_row_id', async () => {
             const msg = { chat_id: '123', role: 'user', content: 'Hello' };
-            await logMessage(mockDB, msg);
+            mockDB.run.mockResolvedValue({ meta: { last_row_id: 42 } });
+            const result = await logMessage(mockDB, msg);
             expect(mockDB.prepare).toHaveBeenCalledWith(
                 'INSERT INTO messages (chat_id, role, content) VALUES (?, ?, ?)'
             );
             expect(mockDB.bind).toHaveBeenCalledWith('123', 'user', 'Hello');
-            expect(mockDB.run).toHaveBeenCalled();
+            expect(result).toBe(42);
         });
     });
 });

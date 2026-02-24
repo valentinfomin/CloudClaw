@@ -4,6 +4,7 @@ import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
 import { uploadFile } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
+import { generateEmbedding, runChat } from '../services/ai.js';
 
 export async function handleUpdate(c, update) {
     const env = c.env;
@@ -27,8 +28,6 @@ export async function handleUpdate(c, update) {
     };
 
     try {
-        console.log(`--- Token Check: ${token.substring(0, 5)}... ---`);
-
         console.log("--- 1. Saving User ---");
         await createUser(env.DB, user);
 
@@ -51,20 +50,14 @@ export async function handleUpdate(c, update) {
                 fileSize = photo.file_size;
             }
 
-            console.log(`--- Fetching File Info for ID: ${fileId} ---`);
             const fileInfo = await getFileInfo(token, fileId);
-            console.log(`--- File Info: ${JSON.stringify(fileInfo)} ---`);
-            
-            console.log(`--- Downloading File: ${fileInfo.file_path} ---`);
             const content = await downloadFile(token, fileInfo.file_path);
 
             const timestamp = Date.now();
             const r2Key = `${chat_id}/${timestamp}_${fileName}`;
 
-            console.log(`--- Uploading to R2: ${r2Key} ---`);
             await uploadFile(env.FILES, r2Key, content, mimeType);
 
-            console.log("--- Creating DB Record ---");
             await createFile(env.DB, {
                 user_id: chat_id,
                 r2_key: r2Key,
@@ -82,7 +75,23 @@ export async function handleUpdate(c, update) {
         const text = message.text;
 
         console.log(`--- User Message: ${text} ---`);
-        await logMessage(env.DB, { chat_id, role: 'user', content: text });
+        const messageId = await logMessage(env.DB, { chat_id, role: 'user', content: text });
+
+        // Index Message
+        try {
+            console.log("--- Indexing Message ---");
+            const vector = await generateEmbedding(env.AI, text);
+            await env.VECTOR_INDEX.upsert([
+                {
+                    id: `msg_${messageId}`,
+                    values: vector,
+                    metadata: { chat_id, message_id: messageId, role: 'user', content: text }
+                }
+            ]);
+        } catch (idxErr) {
+            console.error("FAILED TO INDEX MESSAGE:", idxErr.message);
+            // Don't fail the whole request if indexing fails
+        }
 
         if (text.startsWith('/')) {
             return await handleCommand(c, chat_id, text, token);
@@ -90,34 +99,40 @@ export async function handleUpdate(c, update) {
 
         console.log("--- 2. Fetching History ---");
         const history = await getChatHistory(env.DB, chat_id, 10);
-        console.log(`--- History Length: ${history.length} ---`);
 
         console.log("--- 3. Calling Workers AI ---");
         const messages = [
             { role: 'system', content: 'You are CloudClaw, a smart assistant.' },
             ...history.map(h => ({ role: h.role, content: h.content }))
         ];
+
+        const botReply = await runChat(env.AI, '@cf/meta/llama-3-8b-instruct', messages);
+
+        console.log(`--- 4. Sending to Telegram ---`);
+        await sendMessage(token, chat_id, botReply || "[No response from AI]");
         
-        console.log(`--- AI Input Messages: ${JSON.stringify(messages)} ---`);
+        const assistantMsgId = await logMessage(env.DB, { chat_id, role: 'assistant', content: botReply });
 
-        const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-            messages
-        });
-
-        console.log(`--- AI Response Raw: ${JSON.stringify(aiResponse)} ---`);
-
-        // Some models return 'response', others 'text'. Let's check both.
-        const botReply = aiResponse.response || aiResponse.text || "[No response from AI]";
-
-        console.log(`--- 4. Sending to Telegram: ${botReply} ---`);
-        await sendMessage(token, chat_id, botReply);
-        await logMessage(env.DB, { chat_id, role: 'assistant', content: botReply });
+        // Index Assistant Reply
+        if (botReply) {
+            try {
+                const assistantVector = await generateEmbedding(env.AI, botReply);
+                await env.VECTOR_INDEX.upsert([
+                    {
+                        id: `msg_${assistantMsgId}`,
+                        values: assistantVector,
+                        metadata: { chat_id, message_id: assistantMsgId, role: 'assistant', content: botReply }
+                    }
+                ]);
+            } catch (idxErr) {
+                console.error("FAILED TO INDEX ASSISTANT REPLY:", idxErr.message);
+            }
+        }
 
         console.log("--- DONE ---");
 
     } catch (err) {
         console.error("ERROR IN HANDLER:", err);
-        // Try to send error to user
         try {
             await sendMessage(token, chat_id, "Bot Error: " + err.message);
         } catch (sendErr) {
