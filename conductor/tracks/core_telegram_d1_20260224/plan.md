@@ -21,20 +21,20 @@
     - [x] Sub-task: Write unit tests for DAL functions mocking the D1 binding.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: D1 Database Setup' (Protocol in workflow.md)
 
-## Phase 3: Telegram Webhook Handler
-- [~] Task: Implement Webhook Security & Parsing.
-    - [ ] Sub-task: Create `src/middleware/auth.js` to validate `X-Telegram-Bot-Api-Secret-Token` (if used) or check URL path.
-    - [ ] Sub-task: Create `src/index.js` (entry point) using Hono.
-    - [ ] Sub-task: Write tests for request validation (valid vs invalid tokens).
-- [~] Task: Implement Command Handlers.
-    - [ ] Sub-task: Create `src/handlers/commands.js`.
-    - [ ] Sub-task: Implement `/start` handler.
-    - [ ] Sub-task: Implement `/status` handler.
-    - [ ] Sub-task: Write unit tests for command handlers.
-- [~] Task: Wire up D1 Logging to Handlers.
-    - [ ] Sub-task: Update `src/index.js` to call `users.createUser` and `messages.logMessage` on incoming updates.
-    - [ ] Sub-task: Integration test: Simulate a webhook payload and verify DB side-effects (mocked).
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Telegram Webhook Handler' (Protocol in workflow.md)
+## Phase 3: Telegram Webhook Handler [checkpoint: 082945e]
+- [x] Task: Implement Webhook Security & Parsing.
+    - [x] Sub-task: Create `src/middleware/auth.js` to validate `X-Telegram-Bot-Api-Secret-Token` (if used) or check URL path.
+    - [x] Sub-task: Create `src/index.js` (entry point) using Hono.
+    - [x] Sub-task: Write tests for request validation (valid vs invalid tokens).
+- [x] Task: Implement Command Handlers.
+    - [x] Sub-task: Create `src/handlers/commands.js`.
+    - [x] Sub-task: Implement `/start` handler.
+    - [x] Sub-task: Implement `/status` handler.
+    - [x] Sub-task: Write unit tests for command handlers.
+- [x] Task: Wire up D1 Logging to Handlers.
+    - [x] Sub-task: Update `src/index.js` to call `users.createUser` and `messages.logMessage` on incoming updates.
+    - [x] Sub-task: Integration test: Simulate a webhook payload and verify DB side-effects (mocked).
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Telegram Webhook Handler' (Protocol in workflow.md)
 
 ## Phase 4: Deployment & Verification
 - [ ] Task: Deploy to Cloudflare Workers.
