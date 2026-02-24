@@ -11,6 +11,9 @@ export async function handleUpdate(c, update) {
 
     if (!message) return c.json({ ok: true });
 
+    // Trim token to avoid accidental newlines/spaces
+    const token = env.TG_TOKEN.trim();
+
     const chat_id = String(message.chat.id);
     const user = {
         chat_id,
@@ -19,6 +22,8 @@ export async function handleUpdate(c, update) {
     };
 
     try {
+        console.log(`--- Token Check: ${token.substring(0, 5)}... ---`);
+
         console.log("--- 1. Saving User ---");
         await createUser(env.DB, user);
 
@@ -41,14 +46,20 @@ export async function handleUpdate(c, update) {
                 fileSize = photo.file_size;
             }
 
-            const fileInfo = await getFileInfo(env.TG_TOKEN, fileId);
-            const content = await downloadFile(env.TG_TOKEN, fileInfo.file_path);
+            console.log(`--- Fetching File Info for ID: ${fileId} ---`);
+            const fileInfo = await getFileInfo(token, fileId);
+            console.log(`--- File Info: ${JSON.stringify(fileInfo)} ---`);
+            
+            console.log(`--- Downloading File: ${fileInfo.file_path} ---`);
+            const content = await downloadFile(token, fileInfo.file_path);
 
             const timestamp = Date.now();
             const r2Key = `${chat_id}/${timestamp}_${fileName}`;
 
+            console.log(`--- Uploading to R2: ${r2Key} ---`);
             await uploadFile(env.FILES, r2Key, content, mimeType);
 
+            console.log("--- Creating DB Record ---");
             await createFile(env.DB, {
                 user_id: chat_id,
                 r2_key: r2Key,
@@ -57,7 +68,7 @@ export async function handleUpdate(c, update) {
                 size: fileSize
             });
 
-            await sendMessage(env.TG_TOKEN, chat_id, `File uploaded successfully: ${fileName}`);
+            await sendMessage(token, chat_id, `File uploaded successfully: ${fileName}`);
             return c.json({ ok: true });
         }
 
@@ -68,7 +79,7 @@ export async function handleUpdate(c, update) {
         await logMessage(env.DB, { chat_id, role: 'user', content: text });
 
         if (text.startsWith('/')) {
-            return await handleCommand(c, chat_id, text);
+            return await handleCommand(c, chat_id, text, token);
         }
 
         console.log("--- 2. Fetching History ---");
@@ -82,24 +93,23 @@ export async function handleUpdate(c, update) {
             ]
         });
 
-        // Some models return 'response', others 'text'. Let's check both.
         const botReply = aiResponse.response || aiResponse.text;
 
         console.log("--- 4. Sending to Telegram ---");
-        await sendMessage(env.TG_TOKEN, chat_id, botReply);
+        await sendMessage(token, chat_id, botReply);
         await logMessage(env.DB, { chat_id, role: 'assistant', content: botReply });
 
         console.log("--- DONE ---");
 
     } catch (err) {
         console.error("ERROR IN HANDLER:", err.message);
-        await sendMessage(env.TG_TOKEN, chat_id, "Bot Error: " + err.message);
+        await sendMessage(token, chat_id, "Bot Error: " + err.message);
     }
 
     return c.json({ ok: true });
 }
 
-async function handleCommand(c, chat_id, text) {
+async function handleCommand(c, chat_id, text, token) {
     let reply = "I am CloudClaw AI.";
     
     if (text === '/start') {
@@ -119,6 +129,6 @@ async function handleCommand(c, chat_id, text) {
         reply = `Request to get file ID: ${fileId} received. (Feature pending)`;
     }
     
-    await sendMessage(c.env.TG_TOKEN, chat_id, reply);
+    await sendMessage(token, chat_id, reply);
     return c.json({ ok: true });
 }
