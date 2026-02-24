@@ -9,3 +9,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Implement File Storage with Cloudflare R2 and Telegram Integration**
   *Link: [./tracks/r2_storage_20260224/](./tracks/r2_storage_20260224/)*
+
+- [ ] **Track: Debug and fix AI response issue in Telegram Bot**
+  *Link: [./tracks/debug_ai_20260224/](./tracks/debug_ai_20260224/)*
