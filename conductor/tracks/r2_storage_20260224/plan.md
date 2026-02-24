@@ -23,10 +23,10 @@
     - [x] Sub-task: In the handler: 1. Get file info, 2. Download, 3. Upload to R2, 4. Log to D1, 5. Reply to user.
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Telegram File Handling' (Protocol in workflow.md)
 
-## Phase 4: Retrieval & Deployment
-- [~] Task: Implement Retrieval Commands.
-    - [ ] Sub-task: Implement `/files` command to list files from D1.
-    - [ ] Sub-task: Implement `/get <file_id>` (or similar) to retrieve file from R2 and send to user.
-- [ ] Task: Deploy.
-    - [ ] Sub-task: Deploy updated worker.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Retrieval & Deployment' (Protocol in workflow.md)
+## Phase 4: Retrieval & Deployment [checkpoint: 567869b]
+- [x] Task: Implement Retrieval Commands.
+    - [x] Sub-task: Implement `/files` command to list files from D1.
+    - [x] Sub-task: Implement `/get <file_id>` (or similar) to retrieve file from R2 and send to user.
+- [x] Task: Deploy.
+    - [x] Sub-task: Deploy updated worker.
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Retrieval & Deployment' (Protocol in workflow.md)
