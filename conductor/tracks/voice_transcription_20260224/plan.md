@@ -12,9 +12,9 @@
     - [x] Sub-task: Implement the voice-to-text-to-reasoning flow.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Bot Integration' (Protocol in workflow.md)
 
-## Phase 3: Testing & Deployment
-- [~] Task: Integration Testing.
+## Phase 3: Testing & Deployment [checkpoint: 555c790]
+- [x] Task: Integration Testing.
     - [x] Sub-task: Create a test `test/handler_voice.test.js` to simulate a voice message update.
-- [~] Task: Deploy.
-    - [ ] Sub-task: Run `npx wrangler deploy`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Testing & Deployment' (Protocol in workflow.md)
+- [x] Task: Deploy.
+    - [x] Sub-task: Run `npx wrangler deploy`.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Testing & Deployment' (Protocol in workflow.md)
