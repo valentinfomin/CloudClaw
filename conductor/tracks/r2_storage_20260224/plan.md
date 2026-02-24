@@ -15,13 +15,13 @@
     - [x] Sub-task: Write integration tests (mocking R2 binding) for storage service.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: R2 Storage Logic' (Protocol in workflow.md)
 
-## Phase 3: Telegram File Handling
-- [~] Task: Implement File Download Logic.
-    - [ ] Sub-task: Add `getFile` and `downloadFile` methods to `src/services/telegram.js`.
-    - [ ] Sub-task: Update `src/handlers/commands.js` to detect `document`/`photo` in updates.
-- [~] Task: Integrate Upload Flow.
-    - [ ] Sub-task: In the handler: 1. Get file info, 2. Download, 3. Upload to R2, 4. Log to D1, 5. Reply to user.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Telegram File Handling' (Protocol in workflow.md)
+## Phase 3: Telegram File Handling [checkpoint: d245f68]
+- [x] Task: Implement File Download Logic.
+    - [x] Sub-task: Add `getFile` and `downloadFile` methods to `src/services/telegram.js`.
+    - [x] Sub-task: Update `src/handlers/commands.js` to detect `document`/`photo` in updates.
+- [x] Task: Integrate Upload Flow.
+    - [x] Sub-task: In the handler: 1. Get file info, 2. Download, 3. Upload to R2, 4. Log to D1, 5. Reply to user.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Telegram File Handling' (Protocol in workflow.md)
 
 ## Phase 4: Retrieval & Deployment
 - [ ] Task: Implement Retrieval Commands.
