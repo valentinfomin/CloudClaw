@@ -1,0 +1,22 @@
+{
+  "name": "cloudclaw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "vitest",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "hono": "^4.12.2"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.18",
+    "wrangler": "^4.68.1"
+  }
+}

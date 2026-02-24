@@ -1,0 +1,19 @@
+name = "cloudclaw-agent"
+main = "src/index.js"
+compatibility_date = "2026-02-24"
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cloudclaw-db"
+database_id = "bb14d4b1-f78b-4d0e-96fc-aadbef07253e"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "cloudclaw-storage"
+
+[[vectorize]]
+binding = "VECTOR_INDEX"
+index_name = "cloudclaw-index"

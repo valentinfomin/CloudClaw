@@ -1,0 +1,16 @@
+# Technology Stack
+
+## Core Technologies
+- **Language:** JavaScript (Node.js/Cloudflare Workers runtime).
+- **Platform:** Cloudflare Workers.
+- **Database:** Cloudflare D1 (SQLite compatible).
+- **Storage:** Cloudflare R2 (S3 compatible object storage).
+- **Vector Database:** Cloudflare Vectorize.
+
+## AI & Machine Learning
+- **Inference Engine:** Cloudflare Workers AI.
+- **Model:** `@cf/meta/llama-3-8b-instruct`.
+
+## Development Tools
+- **CLI:** Wrangler (Cloudflare Workers CLI).
+- **Package Manager:** npm/yarn.
