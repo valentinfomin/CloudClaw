@@ -1,0 +1,32 @@
+# Implementation Plan - R2 File Storage Integration
+
+## Phase 1: Database Schema & DAL
+- [ ] Task: Define File Schema.
+    - [ ] Sub-task: Create migration `migrations/0002_files_table.sql` creating the `files` table.
+    - [ ] Sub-task: Apply migration locally and remote.
+- [ ] Task: Implement Files DAL.
+    - [ ] Sub-task: Create `src/db/files.js` with `createFile` and `listFiles` functions.
+    - [ ] Sub-task: Write unit tests for Files DAL.
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Schema & DAL' (Protocol in workflow.md)
+
+## Phase 2: R2 Storage Logic
+- [ ] Task: Implement R2 Service.
+    - [ ] Sub-task: Create `src/services/storage.js` to handle `put` and `get` operations on R2 binding.
+    - [ ] Sub-task: Write integration tests (mocking R2 binding) for storage service.
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: R2 Storage Logic' (Protocol in workflow.md)
+
+## Phase 3: Telegram File Handling
+- [ ] Task: Implement File Download Logic.
+    - [ ] Sub-task: Add `getFile` and `downloadFile` methods to `src/utils/telegram.js` (or similar).
+    - [ ] Sub-task: Update `src/handlers/commands.js` (or create `src/handlers/files.js`) to detect `document`/`photo` in updates.
+- [ ] Task: Integrate Upload Flow.
+    - [ ] Sub-task: In the handler: 1. Get file info, 2. Download, 3. Upload to R2, 4. Log to D1, 5. Reply to user.
+- [ ] Task: Conductor - User Manual Verification 'Phase 3: Telegram File Handling' (Protocol in workflow.md)
+
+## Phase 4: Retrieval & Deployment
+- [ ] Task: Implement Retrieval Commands.
+    - [ ] Sub-task: Implement `/files` command to list files from D1.
+    - [ ] Sub-task: Implement `/get <file_id>` (or similar) to retrieve file from R2 and send to user.
+- [ ] Task: Deploy.
+    - [ ] Sub-task: Deploy updated worker.
+- [ ] Task: Conductor - User Manual Verification 'Phase 4: Retrieval & Deployment' (Protocol in workflow.md)
