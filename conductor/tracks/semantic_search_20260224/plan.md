@@ -23,6 +23,6 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3: RAG Integration' (Protocol in workflow.md)
 
 ## Phase 4: Deployment & Finalization
-- [ ] Task: Deploy.
+- [~] Task: Deploy.
     - [ ] Sub-task: Run `npx wrangler deploy`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Deployment & Finalization' (Protocol in workflow.md)
