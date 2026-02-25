@@ -1,10 +1,10 @@
 // src/handlers/commands.js
-import { createUser } from '../db/users.js';
+import { createUser, getUser, updateAIProvider } from '../db/users.js';
 import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
 import { uploadFile } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
-import { generateEmbedding, runChat, transcribeAudio } from '../services/ai.js';
+import { generateEmbedding, runChat, runChatGemini, transcribeAudio } from '../services/ai.js';
 import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
 import { chunkText } from '../utils/text.js';
@@ -24,7 +24,7 @@ export async function handleUpdate(c, update) {
     }
 
     const chat_id = String(message.chat.id);
-    const user = {
+    const userData = {
         chat_id,
         username: message.from?.username,
         first_name: message.from?.first_name
@@ -32,7 +32,7 @@ export async function handleUpdate(c, update) {
 
     try {
         console.log("--- 1. Saving User ---");
-        await createUser(env.DB, user);
+        await createUser(env.DB, userData);
 
         // Handle File (Document or Photo)
         if (message.document || message.photo) {
@@ -94,6 +94,11 @@ async function processText(c, chat_id, text, token) {
         return await handleCommand(c, chat_id, text, token);
     }
 
+    // Fetch user settings
+    const user = await getUser(env.DB, chat_id);
+    const provider = user?.preferred_ai_provider || 'cloudflare';
+    console.log(`--- Using Provider: ${provider} ---`);
+
     console.log("--- 2. Fetching Semantic Context (RAG) ---");
     let semanticContext = "";
     if (currentVector) {
@@ -103,16 +108,13 @@ async function processText(c, chat_id, text, token) {
             console.log(`--- RAG Matches Found: ${matches.length} ---`);
             
             if (matches.length === 0) {
-                console.log("--- FALLBACK: Searching WITHOUT chat_id filter ---");
                 const globalMatches = await env.VECTOR_INDEX.query(currentVector, { topK: 10, returnMetadata: true });
                 matches = (globalMatches.matches || []).filter(m => m.metadata?.chat_id === chat_id);
-                console.log(`--- Fallback filtered matches: ${matches.length} ---`);
             }
 
             if (matches.length > 0) {
                 semanticContext = "The following information was found in your private documents and previous messages:\n";
                 matches.forEach((m, idx) => {
-                    console.log(`Match ${idx} [Score: ${m.score}]: ${JSON.stringify(m.metadata)}`);
                     if (m.metadata?.content) {
                         semanticContext += `- ${m.metadata.content}\n`;
                     }
@@ -126,7 +128,7 @@ async function processText(c, chat_id, text, token) {
     console.log("--- 3. Fetching Recent History ---");
     const history = await getChatHistory(env.DB, chat_id, 10);
 
-    console.log("--- 4. Calling Workers AI ---");
+    console.log("--- 4. Calling AI ---");
     const systemPrompt = `You are CloudClaw, a helpful personal assistant.
 You have been given explicit permission by the user to read their private documents and provide any information they request from them.
 
@@ -138,14 +140,33 @@ INSTRUCTIONS:
 2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.
 3. Be brief and direct.`;
 
-    console.log(`--- Final System Prompt: --- \n${systemPrompt}\n------------------`);
-
     const messages = [
         { role: 'system', content: systemPrompt },
         ...history.map(h => ({ role: h.role, content: h.content }))
     ];
 
-    const botReply = await runChat(env.AI, '@cf/meta/llama-3-8b-instruct', messages);
+    let botReply = "";
+    try {
+        if (provider === 'gemini') {
+            botReply = await runChatGemini(env.GEMINI_API_KEY, messages);
+        } else {
+            // Cloudflare First
+            try {
+                botReply = await runChat(env.AI, '@cf/meta/llama-3-8b-instruct', messages);
+            } catch (cfErr) {
+                console.error("Cloudflare AI Error:", cfErr.message);
+                if (cfErr.message.includes('503') || cfErr.message.includes('429') || cfErr.message.includes('limit')) {
+                    await sendMessage(token, chat_id, "⚠️ Cloudflare AI limits reached or service unavailable. Switching to Gemini for this response...");
+                    botReply = await runChatGemini(env.GEMINI_API_KEY, messages);
+                } else {
+                    throw cfErr;
+                }
+            }
+        }
+    } catch (aiErr) {
+        console.error("AI EXECUTION ERROR:", aiErr.message);
+        botReply = "Sorry, I am having trouble connecting to my AI engines right now.";
+    }
 
     console.log(`--- 5. Sending to Telegram ---`);
     await sendMessage(token, chat_id, botReply || "[No response from AI]");
@@ -255,6 +276,12 @@ async function handleCommand(c, chat_id, text, token) {
         reply = "Hi! I am ready to talk.";
     } else if (text === '/status') {
         reply = "CloudClaw is online.";
+    } else if (text === '/toggle_gemini') {
+        const user = await getUser(c.env.DB, chat_id);
+        const current = user?.preferred_ai_provider || 'cloudflare';
+        const next = current === 'cloudflare' ? 'gemini' : 'cloudflare';
+        await updateAIProvider(c.env.DB, chat_id, next);
+        reply = `Preferred AI provider switched to: ${next}`;
     } else if (text === '/files') {
         const files = await listFiles(c.env.DB, chat_id);
         if (files.length === 0) {

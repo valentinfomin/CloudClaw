@@ -8,3 +8,8 @@ export async function getUser(db, chat_id) {
     const query = 'SELECT * FROM users WHERE chat_id = ?';
     return await db.prepare(query).bind(chat_id).first();
 }
+
+export async function updateAIProvider(db, chat_id, provider) {
+    const query = 'UPDATE users SET preferred_ai_provider = ? WHERE chat_id = ?';
+    return await db.prepare(query).bind(provider, chat_id).run();
+}

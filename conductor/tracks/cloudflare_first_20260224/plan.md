@@ -1,15 +1,15 @@
 # Implementation Plan - Cloudflare First & Fallback
 
 ## Phase 1: Settings Persistence
-- [ ] Task: Update User Schema.
-    - [ ] Sub-task: Create migration `migrations/0003_user_settings.sql` adding `ai_provider` column.
-    - [ ] Sub-task: Apply migration.
-- [ ] Task: Update User DAL.
+- [x] Task: Update User Schema.
+    - [x] Sub-task: Create migration `migrations/0003_user_settings.sql` adding `ai_provider` column.
+    - [x] Sub-task: Apply migration.
+- [~] Task: Update User DAL.
     - [ ] Sub-task: Update `src/db/users.js` to handle the new column.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Settings Persistence' (Protocol in workflow.md)
 
 ## Phase 2: Routing Logic
-- [ ] Task: Implement Routing.
+- [~] Task: Implement Routing.
     - [ ] Sub-task: Refactor `handleUpdate` to select model based on user settings.
     - [ ] Sub-task: Update `src/services/ai.js` to support text reasoning via Gemini if needed.
 - [ ] Task: Fallback Detection.
