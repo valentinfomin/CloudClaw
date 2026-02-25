@@ -4,7 +4,7 @@ import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
 import { uploadFile, getFile } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
-import { generateEmbedding, runChat, runChatGemini, transcribeAudio, analyzeImageCloudflare } from '../services/ai.js';
+import { generateEmbedding, runChat, runChatGemini, transcribeAudio, analyzeImageCloudflare, PREFERRED_CHAT_MODELS } from '../services/ai.js';
 import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
 import { chunkText } from '../utils/text.js';
