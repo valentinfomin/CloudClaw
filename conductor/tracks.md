@@ -4,9 +4,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Implement manual Gemini override via image captions**
-  *Link: [./tracks/image_caption_override_20260225/](./tracks/image_caption_override_20260225/)*
-
 - [x] **Track: Implement dynamic model selection for Cloudflare Workers AI**
   *Link: [./tracks/dynamic_model_selection_20260225/](./tracks/dynamic_model_selection_20260225/)*
 
