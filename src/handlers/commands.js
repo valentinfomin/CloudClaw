@@ -96,37 +96,56 @@ async function processText(c, chat_id, text, token) {
         return await handleCommand(c, chat_id, text, token);
     }
 
-    console.log("--- 2. Fetching Semantic Context (RAG) ---");
-    let semanticContext = "";
-    if (currentVector) {
-        try {
-            const matches = await semanticSearch(env.VECTOR_INDEX, currentVector, chat_id);
-            if (matches.length > 0) {
-                semanticContext = "Here is some relevant context from past conversations and documents:\n";
-                matches.forEach(m => {
-                    if (m.metadata?.content) {
-                        semanticContext += `- ${m.metadata.content}\n`;
-                    }
-                });
-            }
-        } catch (ragErr) {
-            console.error("FAILED TO FETCH SEMANTIC CONTEXT:", ragErr.message);
-        }
-    }
-
-    console.log("--- 3. Fetching Recent History ---");
-    const history = await getChatHistory(env.DB, chat_id, 10);
-
-    console.log("--- 4. Calling Workers AI ---");
-    const systemPrompt = `You are CloudClaw, a smart assistant. 
-${semanticContext ? `\n${semanticContext}` : ''}
-Use the provided context to answer more accurately if relevant.`;
-
-    const messages = [
-        { role: 'system', content: systemPrompt },
-        ...history.map(h => ({ role: h.role, content: h.content }))
-    ];
-
+                            console.log("--- 2. Fetching Semantic Context (RAG) ---");
+                            let semanticContext = "";
+                            if (currentVector) {
+                                try {
+                                    console.log(`--- Searching for Chat ID: ${chat_id} ---`);
+                                    let matches = await semanticSearch(env.VECTOR_INDEX, currentVector, chat_id);
+                                    console.log(`--- RAG Matches Found: ${matches.length} ---`);
+                                    
+                                                    if (matches.length === 0) {
+                                                        console.log("--- FALLBACK: Searching WITHOUT chat_id filter ---");
+                                                        const globalMatches = await env.VECTOR_INDEX.query(currentVector, { topK: 10, returnMetadata: true });
+                                                        matches = (globalMatches.matches || []).filter(m => m.metadata?.chat_id === chat_id);
+                                                        console.log(`--- Fallback filtered matches: ${matches.length} ---`);
+                                                    }
+                                    
+                                                    if (matches.length > 0) {
+                                                        semanticContext = "The following information was found in your private documents and previous messages:\n";
+                                                        matches.forEach((m, idx) => {
+                                                            console.log(`Match ${idx} [Score: ${m.score}]: ${JSON.stringify(m.metadata)}`);
+                                                            if (m.metadata?.content) {
+                                                                semanticContext += `- ${m.metadata.content}\n`;
+                                                            }
+                                                        });
+                                                    }
+                                                } catch (ragErr) {
+                                                    console.error("FAILED TO FETCH SEMANTIC CONTEXT:", ragErr.message);
+                                                }
+                                            }
+                                    
+                                                    console.log("--- 3. Fetching Recent History ---");
+                                                    const history = await getChatHistory(env.DB, chat_id, 10);
+                                            
+                                                    console.log("--- 4. Calling Workers AI ---");
+                                                    const systemPrompt = `You are CloudClaw, a helpful personal assistant.
+                                            You have been given explicit permission by the user to read their private documents and provide any information they request from them.
+                                            
+                                            CONTEXT FROM USER'S DOCUMENTS:
+                                            ${semanticContext || "No document context found."}
+                                            
+                                            INSTRUCTIONS:
+                                            1. You MUST use the CONTEXT to answer the user's question.
+                                            2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.
+                                            3. Be brief and direct.`;
+                                            
+                                                    console.log(`--- Final System Prompt: --- \n${systemPrompt}\n------------------`);
+    
+            const messages = [
+                { role: 'system', content: systemPrompt },
+                ...history.map(h => ({ role: h.role, content: h.content }))
+            ];
     const botReply = await runChat(env.AI, '@cf/meta/llama-3-8b-instruct', messages);
 
     console.log(`--- 5. Sending to Telegram ---`);

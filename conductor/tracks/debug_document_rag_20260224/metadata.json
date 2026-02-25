@@ -1,0 +1,8 @@
+{
+  "track_id": "debug_document_rag_20260224",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-02-24T18:00:00Z",
+  "updated_at": "2026-02-24T18:00:00Z",
+  "description": "Debug why AI doesn't see document context in RAG"
+}
