@@ -18,3 +18,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Image Analysis and OCR with Google Gemini**
   *Link: [./tracks/image_analysis_20260224/](./tracks/image_analysis_20260224/)*
+
+---
+
+- [ ] **Track: I need to add a data import system. This system should be able to handle ongoing, real-time data synchronization. The field mapping should be automatic, based on matching column names. If there are errors in the data, the system should skip those rows and continue the import. If a field name in the source does not match a field in our data model, the system should provide a notification. This feature is valuable but not critical.**
+*Link: [./tracks/data_import_system_20260225/](./tracks/data_import_system_20260225/)*

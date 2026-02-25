@@ -1,0 +1,8 @@
+{
+  "track_id": "data_import_system_20260225",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-25T13:10:00Z",
+  "updated_at": "2026-02-25T13:10:00Z",
+  "description": "I need to add a data import system. This system should be able to handle ongoing, real-time data synchronization. The field mapping should be automatic, based on matching column names. If there are errors in the data, the system should skip those rows and continue the import. If a field name in the source does not match a field in our data model, the system should provide a notification. This feature is valuable but not critical."
+}
