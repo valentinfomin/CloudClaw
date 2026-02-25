@@ -9,6 +9,7 @@ import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
 import { chunkText } from '../utils/text.js';
 import { analyzeImage } from '../services/gemini.js';
+import { mapData } from '../services/import_service.js';
 
 export async function handleUpdate(c, update) {
     const env = c.env;
@@ -343,6 +344,32 @@ async function handleCommand(c, chat_id, text, token) {
     } else if (text.startsWith('/get ')) {
         const fileId = text.split(' ')[1];
         reply = `Request to get file ID: ${fileId} received. (Feature pending)`;
+    } else if (text.startsWith('/import ')) {
+        try {
+            const jsonString = text.substring(text.indexOf('{'));
+            const data = JSON.parse(jsonString);
+            
+            // This is a placeholder for a real target model
+            const targetModel = {
+                name: null,
+                email: null
+            };
+            
+            const mappedData = mapData(data, targetModel, {
+                'user_name': 'name',
+                'user_email': 'email'
+            });
+
+            if(mappedData) {
+                // Here you would typically save the mappedData to the database
+                reply = `Successfully imported data for: ${mappedData.name}`;
+            } else {
+                reply = 'Import failed due to missing required fields.';
+            }
+
+        } catch (e) {
+            reply = `Failed to import data: ${e.message}`;
+        }
     }
     
     await sendMessage(token, chat_id, reply);
