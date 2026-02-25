@@ -8,16 +8,16 @@
     - [x] Sub-task: Write unit tests for extraction logic.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Text Extraction Service' (Protocol in workflow.md)
 
-## Phase 2: Chunking & Indexing Pipeline
-- [~] Task: Implement Chunking Logic.
-    - [ ] Sub-task: Add `chunkText` utility to `src/utils/text.js`.
-- [ ] Task: Integrated Document Indexing.
-    - [ ] Sub-task: Update `handleFile` in `src/handlers/commands.js` to trigger extraction and indexing after R2 upload.
-    - [ ] Sub-task: Store chunks in `VECTOR_INDEX`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Chunking & Indexing Pipeline' (Protocol in workflow.md)
+## Phase 2: Chunking & Indexing Pipeline [checkpoint: 601c022]
+- [x] Task: Implement Chunking Logic.
+    - [x] Sub-task: Add `chunkText` utility to `src/utils/text.js`.
+- [x] Task: Integrated Document Indexing.
+    - [x] Sub-task: Update `handleFile` in `src/handlers/commands.js` to trigger extraction and indexing after R2 upload.
+    - [x] Sub-task: Store chunks in `VECTOR_INDEX`.
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Chunking & Indexing Pipeline' (Protocol in workflow.md)
 
 ## Phase 3: Enhanced RAG Retrieval
-- [ ] Task: Unified Semantic Search.
+- [~] Task: Unified Semantic Search.
     - [ ] Sub-task: Update `semanticSearch` in `src/services/vector.js` to handle document-sourced metadata.
     - [ ] Sub-task: Verify retrieval from both chat history and documents.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Enhanced RAG Retrieval' (Protocol in workflow.md)
