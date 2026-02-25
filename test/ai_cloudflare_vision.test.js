@@ -12,7 +12,7 @@ describe('AI Service (Cloudflare Vision)', () => {
         const imageBuffer = new Uint8Array([1, 2, 3]).buffer;
         const result = await analyzeImageCloudflare(mockAI, imageBuffer);
         
-        expect(mockAI.run).toHaveBeenCalledWith('@cf/llava-1.5-7b-hf', {
+        expect(mockAI.run).toHaveBeenCalledWith('@cf/llava-hf/llava-1.5-7b-hf', {
             image: [...new Uint8Array(imageBuffer)],
             prompt: expect.any(String)
         });

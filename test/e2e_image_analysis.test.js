@@ -47,12 +47,17 @@ describe('End-to-End Image Analysis Flow', () => {
         const imageDesc = "A photo of a red car.";
         TelegramService.getFileInfo.mockResolvedValue({ file_path: 'photos/img.jpg' });
         TelegramService.downloadFile.mockResolvedValue(new ArrayBuffer(500));
-        GeminiService.analyzeImage.mockResolvedValue(imageDesc);
+        
+        // Mock default provider behavior
+        const UsersDAL = await import('../src/db/users.js');
+        UsersDAL.getUser.mockResolvedValue({ preferred_ai_provider: 'cloudflare' });
+        AI.analyzeImageCloudflare.mockResolvedValue(imageDesc);
+        
         AI.generateEmbedding.mockResolvedValue([0.1]);
 
         await handleUpdate(c, uploadUpdate);
 
-        expect(GeminiService.analyzeImage).toHaveBeenCalled();
+        expect(AI.analyzeImageCloudflare).toHaveBeenCalled();
         expect(mockEnv.VECTOR_INDEX.upsert).toHaveBeenCalled();
 
         // 2. Simulate Question about the image

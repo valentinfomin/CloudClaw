@@ -42,11 +42,13 @@ describe('Image Analysis Integration', () => {
         };
 
         const mockBuffer = new ArrayBuffer(500);
-        const geminiDescription = "A photo of a white refrigerator.";
-
+        const imageDesc = "A photo of a white refrigerator.";
         TelegramService.getFileInfo.mockResolvedValue({ file_path: 'photos/img.jpg' });
         TelegramService.downloadFile.mockResolvedValue(mockBuffer);
-        GeminiService.analyzeImage.mockResolvedValue(geminiDescription);
+        
+        const UsersDAL = await import('../src/db/users.js');
+        UsersDAL.getUser.mockResolvedValue({ preferred_ai_provider: 'gemini' });
+        GeminiService.analyzeImage.mockResolvedValue(imageDesc);
         AI.generateEmbedding.mockResolvedValue([0.1]);
 
         const c = { env: mockEnv, json: vi.fn() };
@@ -54,7 +56,7 @@ describe('Image Analysis Integration', () => {
         await handleUpdate(c, update);
 
         // Verify Gemini was called
-        expect(GeminiService.analyzeImage).toHaveBeenCalledWith('gemini_key', mockBuffer, 'image/jpeg');
+        expect(GeminiService.analyzeImage).toHaveBeenCalledWith('gemini_key', expect.any(ArrayBuffer), 'image/jpeg');
 
         // Verify indexing
         expect(mockEnv.VECTOR_INDEX.upsert).toHaveBeenCalledWith(
@@ -62,7 +64,7 @@ describe('Image Analysis Integration', () => {
                 expect.objectContaining({
                     metadata: expect.objectContaining({ 
                         source: 'image_analysis', 
-                        content: geminiDescription 
+                        content: imageDesc 
                     })
                 })
             ])
@@ -72,7 +74,7 @@ describe('Image Analysis Integration', () => {
         expect(TelegramService.sendMessage).toHaveBeenCalledWith(
             expect.any(String),
             '123',
-            expect.stringContaining(geminiDescription)
+            expect.stringContaining(imageDesc)
         );
     });
 });

@@ -2,10 +2,39 @@
  * AI Service for Cloudflare Workers AI
  */
 
+const PREFERRED_EMBEDDING_MODELS = [
+    '@cf/baai/bge-base-en-v1.5',
+    '@cf/baai/bge-large-en-v1.5',
+    '@cf/baai/bge-small-en-v1.5'
+];
+
+const PREFERRED_CHAT_MODELS = [
+    '@cf/meta/llama-3.1-8b-instruct',
+    '@cf/meta/llama-3-8b-instruct',
+    '@cf/qwen/qwen1.5-14b-chat-awq'
+];
+
+const PREFERRED_VISION_MODELS = [
+    '@cf/llava-hf/llava-1.5-7b-hf',
+    '@cf/unum/uform-gen2-qwen-500m'
+];
+
+async function runCascade(ai, models, payload) {
+    let lastError = null;
+    for (const model of models) {
+        try {
+            console.log(`[AI Cascade] Trying model: ${model}`);
+            return await ai.run(model, payload);
+        } catch (err) {
+            console.warn(`[AI Cascade] Model ${model} failed: ${err.message}`);
+            lastError = err;
+        }
+    }
+    throw new Error(`All preferred models failed. Last error: ${lastError?.message}`);
+}
+
 export async function generateEmbedding(ai, text) {
-    const response = await ai.run('@cf/baai/bge-base-en-v1.5', {
-        text: [text]
-    });
+    const response = await runCascade(ai, PREFERRED_EMBEDDING_MODELS, { text: [text] });
     
     if (!response.data || !response.data[0]) {
         throw new Error('Failed to generate embedding: Invalid response format');
@@ -14,8 +43,9 @@ export async function generateEmbedding(ai, text) {
     return response.data[0];
 }
 
-export async function runChat(ai, model, messages) {
-    const response = await ai.run(model, { messages });
+export async function runChat(ai, modelsToTry, messages) {
+    const models = Array.isArray(modelsToTry) ? modelsToTry : PREFERRED_CHAT_MODELS;
+    const response = await runCascade(ai, models, { messages });
     return response.response || response.text || "";
 }
 
@@ -94,7 +124,7 @@ export async function runChatGemini(apiKey, messages) {
  * Analyze an image using Cloudflare Workers AI (Llava)
  */
 export async function analyzeImageCloudflare(ai, imageBuffer) {
-    const response = await ai.run('@cf/llava-hf/llava-1.5-7b-hf', {
+    const response = await runCascade(ai, PREFERRED_VISION_MODELS, {
         image: [...new Uint8Array(imageBuffer)],
         prompt: "Describe this image concisely. Extract any text or numbers found."
     });
