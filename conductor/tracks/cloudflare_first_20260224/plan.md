@@ -16,12 +16,12 @@
     - [x] Sub-task: Add error handling to catch Cloudflare limit exceptions.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Routing Logic' (Protocol in workflow.md)
 
-## Phase 3: Control Commands
-- [~] Task: Implement `/toggle_gemini`.
-    - [ ] Sub-task: Create command handler to update the user's provider in D1.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Control Commands' (Protocol in workflow.md)
+## Phase 3: Control Commands [checkpoint: 6a0964e]
+- [x] Task: Implement `/toggle_gemini`.
+    - [x] Sub-task: Create command handler to update the user's provider in D1.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Control Commands' (Protocol in workflow.md)
 
 ## Phase 4: Finalization
-- [ ] Task: End-to-End Test.
-- [ ] Task: Deploy.
+- [~] Task: End-to-End Test.
+- [~] Task: Deploy.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Finalization' (Protocol in workflow.md)
