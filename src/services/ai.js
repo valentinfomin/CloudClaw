@@ -89,3 +89,19 @@ export async function runChatGemini(apiKey, messages) {
 
     throw new Error('Failed to extract text from Gemini response');
 }
+
+/**
+ * Analyze an image using Cloudflare Workers AI (Llava)
+ */
+export async function analyzeImageCloudflare(ai, imageBuffer) {
+    const response = await ai.run('@cf/llava-1.5-7b-hf', {
+        image: [...new Uint8Array(imageBuffer)],
+        prompt: "Describe this image concisely. Extract any text or numbers found."
+    });
+    
+    if (!response.description) {
+        throw new Error('Failed to analyze image with Cloudflare: No description returned');
+    }
+    
+    return response.description;
+}

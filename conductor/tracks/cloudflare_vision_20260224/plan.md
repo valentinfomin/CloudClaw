@@ -1,7 +1,7 @@
 # Implementation Plan - Cloudflare Vision
 
 ## Phase 1: AI Service Extension
-- [ ] Task: Implement Cloudflare Vision Client.
+- [~] Task: Implement Cloudflare Vision Client.
     - [ ] Sub-task: Add `analyzeImageCloudflare` to `src/services/ai.js`.
     - [ ] Sub-task: Write unit tests for the new function.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: AI Service Extension' (Protocol in workflow.md)
