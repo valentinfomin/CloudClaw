@@ -94,7 +94,7 @@ export async function runChatGemini(apiKey, messages) {
  * Analyze an image using Cloudflare Workers AI (Llava)
  */
 export async function analyzeImageCloudflare(ai, imageBuffer) {
-    const response = await ai.run('@cf/llava-1.5-7b-hf', {
+    const response = await ai.run('@cf/llava-hf/llava-1.5-7b-hf', {
         image: [...new Uint8Array(imageBuffer)],
         prompt: "Describe this image concisely. Extract any text or numbers found."
     });

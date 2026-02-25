@@ -2,9 +2,9 @@
 import { createUser, getUser, updateAIProvider } from '../db/users.js';
 import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
-import { uploadFile } from '../services/storage.js';
+import { uploadFile, getFile } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
-import { generateEmbedding, runChat, runChatGemini, transcribeAudio } from '../services/ai.js';
+import { generateEmbedding, runChat, runChatGemini, transcribeAudio, analyzeImageCloudflare } from '../services/ai.js';
 import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
 import { chunkText } from '../utils/text.js';
@@ -225,9 +225,30 @@ async function handleFile(c, chat_id, message, token) {
 
     if (isPhoto) {
         try {
-            console.log("--- Analyzing Photo with Gemini ---");
-            const description = await analyzeImage(env.GEMINI_API_KEY, content, mimeType);
-            console.log(`--- Gemini Description: ${description} ---`);
+            const user = await getUser(env.DB, chat_id);
+            const provider = user?.preferred_ai_provider || 'cloudflare';
+            console.log(`--- Analyzing Photo (Provider: ${provider}) ---`);
+            
+            let description = "";
+            let engineUsed = "";
+
+            if (provider === 'gemini') {
+                description = await analyzeImage(env.GEMINI_API_KEY, content, mimeType);
+                engineUsed = "Google Gemini";
+            } else {
+                // Cloudflare First
+                try {
+                    description = await analyzeImageCloudflare(env.AI, content);
+                    engineUsed = "Cloudflare Vision";
+                } catch (cfErr) {
+                    console.error("Cloudflare Vision Error:", cfErr.message);
+                    await sendMessage(token, chat_id, "⚠️ Cloudflare Vision failed. Falling back to Gemini for high-detail analysis...");
+                    description = await analyzeImage(env.GEMINI_API_KEY, content, mimeType);
+                    engineUsed = "Google Gemini (Fallback)";
+                }
+            }
+
+            console.log(`--- ${engineUsed} Description: ${description} ---`);
             
             const vector = await generateEmbedding(env.AI, description);
             await env.VECTOR_INDEX.upsert([{
@@ -236,10 +257,10 @@ async function handleFile(c, chat_id, message, token) {
                 metadata: { chat_id, file_id: fileRecordId, source: 'image_analysis', filename: fileName, content: description }
             }]);
             
-            await sendMessage(token, chat_id, `Image analyzed: ${description}`);
-        } catch (gemErr) {
-            console.error("GEMINI ERROR:", gemErr.message);
-            await sendMessage(token, chat_id, `File stored, but analysis failed: ${gemErr.message}`);
+            await sendMessage(token, chat_id, `[${engineUsed}] I see: ${description}`);
+        } catch (photoErr) {
+            console.error("PHOTO ANALYSIS ERROR:", photoErr.message);
+            await sendMessage(token, chat_id, `File stored, but analysis failed: ${photoErr.message}`);
         }
     } else {
         try {
@@ -282,6 +303,25 @@ async function handleCommand(c, chat_id, text, token) {
         const next = current === 'cloudflare' ? 'gemini' : 'cloudflare';
         await updateAIProvider(c.env.DB, chat_id, next);
         reply = `Preferred AI provider switched to: ${next}`;
+    } else if (text === '/test_cf_vision') {
+        const files = await listFiles(c.env.DB, chat_id);
+        if (files.length === 0 || !files.find(f => f.content_type.startsWith('image'))) {
+            reply = "Please upload a photo first, then run this command.";
+        } else {
+            const lastPhoto = files.filter(f => f.content_type.startsWith('image'))[0];
+            const content = await getFile(c.env.FILES, lastPhoto.r2_key);
+            if (!content) {
+                reply = "Failed to retrieve the last photo from storage.";
+            } else {
+                try {
+                    const buffer = await content.arrayBuffer();
+                    const description = await analyzeImageCloudflare(c.env.AI, buffer);
+                    reply = `[RAW CF VISION OUTPUT]\n${description}`;
+                } catch (e) {
+                    reply = `[CF VISION ERROR]\n${e.message}`;
+                }
+            }
+        }
     } else if (text === '/files') {
         const files = await listFiles(c.env.DB, chat_id);
         if (files.length === 0) {
