@@ -4,6 +4,12 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Implement Cloudflare Vision and Smart Image Routing**
+  *Link: [./tracks/cloudflare_vision_20260224/](./tracks/cloudflare_vision_20260224/)*
+
+- [ ] **Track: Fix Gemini API 'Not Found' error**
+  *Link: [./tracks/fix_gemini_api_20260224/](./tracks/fix_gemini_api_20260224/)*
+
 - [x] **Track: Implement Cloudflare First routing and Gemini fallback logic**
   *Link: [./tracks/cloudflare_first_20260224/](./tracks/cloudflare_first_20260224/)*
 

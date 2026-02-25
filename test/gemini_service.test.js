@@ -38,7 +38,8 @@ describe('Gemini Service', () => {
     it('analyzeImage should throw if API fails', async () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: false,
-            statusText: 'Bad Request'
+            statusText: 'Bad Request',
+            text: () => Promise.resolve('Error details')
         });
         
         await expect(analyzeImage('key', new ArrayBuffer(0), 'image/jpeg')).rejects.toThrow('Gemini API Error: Bad Request');

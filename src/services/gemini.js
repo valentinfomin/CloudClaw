@@ -9,18 +9,55 @@
  * @param {string} mimeType 
  * @returns {Promise<string>}
  */
-export async function analyzeImage(apiKey, imageBuffer, mimeType) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+let cachedModelId = null;
+
+async function getAvailableModel(apiKey) {
+    if (cachedModelId) return cachedModelId;
+
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data && data.models) {
+            // Priority list of models we prefer
+            const preferredModels = [
+                'models/gemini-2.5-flash',
+                'models/gemini-2.0-flash',
+                'models/gemini-1.5-flash',
+                'models/gemini-flash-latest'
+            ];
+            
+            for (const preferred of preferredModels) {
+                if (data.models.some(m => m.name === preferred)) {
+                    cachedModelId = preferred.replace('models/', '');
+                    return cachedModelId;
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to fetch available models, falling back to default", e);
+    }
     
-    const base64Image = btoa(
-        new Uint8Array(imageBuffer)
-            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-    );
+    // Ultimate fallback if fetch fails
+    return 'gemini-2.5-flash';
+}
+
+export async function analyzeImage(apiKey, imageBuffer, mimeType) {
+    if (!apiKey) throw new Error('GEMINI_API_KEY is missing');
+    
+    const modelId = await getAvailableModel(apiKey);
+    console.log(`--- Gemini request using model: ${modelId} ---`);
+    
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
+    
+    // Robust Base64 conversion
+    const base64Image = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
 
     const payload = {
         contents: [{
             parts: [
-                { text: "Provide a detailed description of this image and extract any text or numbers found within it. Be direct and concise." },
+                { text: "Describe this image concisely. Extract any text or numbers found." },
                 {
                     inline_data: {
                         mime_type: mimeType,
@@ -38,6 +75,8 @@ export async function analyzeImage(apiKey, imageBuffer, mimeType) {
     });
 
     if (!response.ok) {
+        const errorBody = await response.text();
+        console.error(`Gemini API Error Body: ${errorBody}`);
         throw new Error(`Gemini API Error: ${response.statusText}`);
     }
 

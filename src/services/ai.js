@@ -31,15 +31,37 @@ export async function transcribeAudio(ai, audioBuffer) {
     return response.text;
 }
 
+let cachedGeminiModelId = null;
+
+async function getAvailableGeminiModel(apiKey) {
+    if (cachedGeminiModelId) return cachedGeminiModelId;
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data && data.models) {
+            const preferredModels = ['models/gemini-2.5-flash', 'models/gemini-2.0-flash', 'models/gemini-1.5-flash', 'models/gemini-flash-latest'];
+            for (const preferred of preferredModels) {
+                if (data.models.some(m => m.name === preferred)) {
+                    cachedGeminiModelId = preferred.replace('models/', '');
+                    return cachedGeminiModelId;
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to fetch available models", e);
+    }
+    return 'gemini-2.5-flash';
+}
+
 /**
  * Run chat via Google Gemini API
  */
 export async function runChatGemini(apiKey, messages) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const modelId = await getAvailableGeminiModel(apiKey);
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
     
     // Convert Cloudflare/OpenAI message format to Gemini format
-    // Cloudflare: {role, content}
-    // Gemini: {role: "user"|"model", parts: [{text}]}
     const geminiMessages = messages.map(m => ({
         role: m.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: m.content }]
