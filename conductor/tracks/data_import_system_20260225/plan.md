@@ -7,9 +7,9 @@
     - [x] Sub-task: Implement the automatic field mapping based on column names.
     - [x] Sub-task: Write unit tests for the error handling logic (skipping rows).
     - [x] Sub-task: Implement the error handling for skipping rows with errors.
-- [ ] Task: Develop the notification system for field mismatches.
-    - [ ] Sub-task: Write tests for the simple alert notification.
-    - [ ] Sub-task: Implement the simple alert mechanism.
+- [x] Task: Develop the notification system for field mismatches. d3c5ded
+    - [x] Sub-task: Write tests for the simple alert notification.
+    - [x] Sub-task: Implement the simple alert mechanism.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Core Service Development' (Protocol in workflow.md)
 
 ## Phase 2: Integration and Testing
