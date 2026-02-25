@@ -16,14 +16,14 @@
     - [x] Sub-task: Store chunks in `VECTOR_INDEX`.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Chunking & Indexing Pipeline' (Protocol in workflow.md)
 
-## Phase 3: Enhanced RAG Retrieval
-- [~] Task: Unified Semantic Search.
-    - [ ] Sub-task: Update `semanticSearch` in `src/services/vector.js` to handle document-sourced metadata.
-    - [ ] Sub-task: Verify retrieval from both chat history and documents.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Enhanced RAG Retrieval' (Protocol in workflow.md)
+## Phase 3: Enhanced RAG Retrieval [checkpoint: 2004d6f]
+- [x] Task: Unified Semantic Search.
+    - [x] Sub-task: Update `semanticSearch` in `src/services/vector.js` to handle document-sourced metadata.
+    - [x] Sub-task: Verify retrieval from both chat history and documents.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Enhanced RAG Retrieval' (Protocol in workflow.md)
 
 ## Phase 4: Finalization & Deployment
-- [ ] Task: End-to-End Test.
+- [~] Task: End-to-End Test.
     - [ ] Sub-task: Upload a text file and ask a specific question.
 - [ ] Task: Deploy.
     - [ ] Sub-task: Run `npx wrangler deploy`.
