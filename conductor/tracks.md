@@ -4,7 +4,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Debug why AI doesn't see document context in RAG**
+- [x] **Track: Debug why AI doesn't see document context in RAG**
   *Link: [./tracks/debug_document_rag_20260224/](./tracks/debug_document_rag_20260224/)*
 
 - [x] **Track: Fix Vectorize dimension mismatch between model and index**
