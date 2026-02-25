@@ -1,0 +1,8 @@
+{
+  "track_id": "cloudflare_first_20260224",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-24T19:00:00Z",
+  "updated_at": "2026-02-24T19:00:00Z",
+  "description": "Implement Cloudflare First routing and Gemini fallback logic"
+}
