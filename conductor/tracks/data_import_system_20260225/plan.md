@@ -10,7 +10,7 @@
 - [x] Task: Develop the notification system for field mismatches. d3c5ded
     - [x] Sub-task: Write tests for the simple alert notification.
     - [x] Sub-task: Implement the simple alert mechanism.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Core Service Development' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Core Service Development' (Protocol in workflow.md) [checkpoint: 3ce9c0b]
 
 ## Phase 2: Integration and Testing
 
