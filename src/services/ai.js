@@ -3,7 +3,7 @@
  */
 
 export async function generateEmbedding(ai, text) {
-    const response = await ai.run('@cf/baai/bge-small-en-v1.5', {
+    const response = await ai.run('@cf/baai/bge-base-en-v1.5', {
         text: [text]
     });
     

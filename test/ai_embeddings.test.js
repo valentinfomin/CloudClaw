@@ -11,7 +11,7 @@ describe('AI Embedding Service', () => {
 
         const result = await generateEmbedding(mockAI, 'Hello world');
         
-        expect(mockAI.run).toHaveBeenCalledWith('@cf/baai/bge-small-en-v1.5', {
+        expect(mockAI.run).toHaveBeenCalledWith('@cf/baai/bge-base-en-v1.5', {
             text: ['Hello world']
         });
         expect(result).toEqual([0.1, 0.2, 0.3]);
