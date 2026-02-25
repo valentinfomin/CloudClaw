@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { mapData } from '../src/services/import_service.js';
+import * as notificationService from '../src/services/notification_service.js';
+
+vi.mock('../src/services/notification_service.js');
 
 describe('Data Import Service', () => {
     describe('mapData', () => {
@@ -82,6 +85,20 @@ describe('Data Import Service', () => {
 
             const result = mapData(sourceData, targetModel, {}, ['email']);
             expect(result).toBeNull();
+        });
+
+        it('should send a notification for unmapped fields', () => {
+            const sourceData = {
+                'name': 'John Doe',
+                'unmapped_field': 'test'
+            };
+
+            const targetModel = {
+                name: null,
+            };
+
+            mapData(sourceData, targetModel, {});
+            expect(notificationService.sendNotification).toHaveBeenCalledWith('Unmapped field: unmapped_field');
         });
     });
 });
