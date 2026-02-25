@@ -17,9 +17,9 @@
 - [x] Task: Integrate the synchronization service with the main application. 6c527b3
     - [x] Sub-task: Write integration tests to verify the end-to-end data flow.
     - [x] Sub-task: Implement the integration points.
-- [ ] Task: End-to-end testing in a staging environment.
-    - [ ] Sub-task: Prepare test data with various scenarios (matching fields, mismatched fields, rows with errors).
-    - [ ] Sub-task: Execute end-to-end tests and validate the results.
+- [x] Task: End-to-end testing in a staging environment.
+    - [x] Sub-task: Prepare test data with various scenarios (matching fields, mismatched fields, rows with errors).
+    - [x] Sub-task: Execute end-to-end tests and validate the results.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Integration and Testing' (Protocol in workflow.md)
 
 ## Phase 3: Deployment
