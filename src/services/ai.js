@@ -2,19 +2,19 @@
  * AI Service for Cloudflare Workers AI
  */
 
-const PREFERRED_EMBEDDING_MODELS = [
+export const PREFERRED_EMBEDDING_MODELS = [
     '@cf/baai/bge-base-en-v1.5',
     '@cf/baai/bge-large-en-v1.5',
     '@cf/baai/bge-small-en-v1.5'
 ];
 
-const PREFERRED_CHAT_MODELS = [
+export const PREFERRED_CHAT_MODELS = [
     '@cf/meta/llama-3.1-8b-instruct',
     '@cf/meta/llama-3-8b-instruct',
     '@cf/qwen/qwen1.5-14b-chat-awq'
 ];
 
-const PREFERRED_VISION_MODELS = [
+export const PREFERRED_VISION_MODELS = [
     '@cf/llava-hf/llava-1.5-7b-hf',
     '@cf/unum/uform-gen2-qwen-500m'
 ];
@@ -61,6 +61,19 @@ export async function transcribeAudio(ai, audioBuffer) {
     return response.text;
 }
 
+export async function analyzeImageCloudflare(ai, imageBuffer) {
+    const response = await runCascade(ai, PREFERRED_VISION_MODELS, {
+        image: [...new Uint8Array(imageBuffer)],
+        prompt: "Describe this image concisely. Extract any text or numbers found."
+    });
+    
+    if (!response.description) {
+        throw new Error('Failed to analyze image with Cloudflare: No description returned');
+    }
+    
+    return response.description;
+}
+
 let cachedGeminiModelId = null;
 
 async function getAvailableGeminiModel(apiKey) {
@@ -84,14 +97,10 @@ async function getAvailableGeminiModel(apiKey) {
     return 'gemini-2.5-flash';
 }
 
-/**
- * Run chat via Google Gemini API
- */
 export async function runChatGemini(apiKey, messages) {
     const modelId = await getAvailableGeminiModel(apiKey);
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
     
-    // Convert Cloudflare/OpenAI message format to Gemini format
     const geminiMessages = messages.map(m => ({
         role: m.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: m.content }]
@@ -118,20 +127,4 @@ export async function runChatGemini(apiKey, messages) {
     }
 
     throw new Error('Failed to extract text from Gemini response');
-}
-
-/**
- * Analyze an image using Cloudflare Workers AI (Llava)
- */
-export async function analyzeImageCloudflare(ai, imageBuffer) {
-    const response = await runCascade(ai, PREFERRED_VISION_MODELS, {
-        image: [...new Uint8Array(imageBuffer)],
-        prompt: "Describe this image concisely. Extract any text or numbers found."
-    });
-    
-    if (!response.description) {
-        throw new Error('Failed to analyze image with Cloudflare: No description returned');
-    }
-    
-    return response.description;
 }

@@ -152,7 +152,7 @@ INSTRUCTIONS:
         } else {
             // Cloudflare First
             try {
-                botReply = await runChat(env.AI, '@cf/meta/llama-3-8b-instruct', messages);
+                botReply = await runChat(env.AI, PREFERRED_CHAT_MODELS, messages);
             } catch (cfErr) {
                 console.error("Cloudflare AI Error:", cfErr.message);
                 if (cfErr.message.includes('503') || cfErr.message.includes('429') || cfErr.message.includes('limit')) {
@@ -226,7 +226,17 @@ async function handleFile(c, chat_id, message, token) {
     if (isPhoto) {
         try {
             const user = await getUser(env.DB, chat_id);
-            const provider = user?.preferred_ai_provider || 'cloudflare';
+            let provider = user?.preferred_ai_provider || 'cloudflare';
+            
+            // Caption Override Logic
+            const caption = message.caption?.toLowerCase() || "";
+            let manualOverride = false;
+            if (caption.includes('gemini') || caption.includes('ocr')) {
+                provider = 'gemini';
+                manualOverride = true;
+                console.log(`--- Manual Override Triggered: Gemini via caption ---`);
+            }
+
             console.log(`--- Analyzing Photo (Provider: ${provider}) ---`);
             
             let description = "";
@@ -234,7 +244,7 @@ async function handleFile(c, chat_id, message, token) {
 
             if (provider === 'gemini') {
                 description = await analyzeImage(env.GEMINI_API_KEY, content, mimeType);
-                engineUsed = "Google Gemini";
+                engineUsed = manualOverride ? "Google Gemini (Manual Override)" : "Google Gemini";
             } else {
                 // Cloudflare First
                 try {

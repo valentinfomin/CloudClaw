@@ -1,11 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { handleUpdate } from '../src/handlers/commands.js';
-import * as AI from '../src/services/ai.js';
 import * as UsersDAL from '../src/db/users.js';
 import * as TelegramService from '../src/services/telegram.js';
 import * as MessagesDAL from '../src/db/messages.js';
 
-vi.mock('../src/services/ai.js');
+// We have to mock AI but keep PREFERRED_CHAT_MODELS exported
+vi.mock('../src/services/ai.js', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    runChat: vi.fn(),
+    runChatGemini: vi.fn(),
+    generateEmbedding: vi.fn(),
+  };
+});
+import * as AI from '../src/services/ai.js';
+
 vi.mock('../src/db/users.js');
 vi.mock('../src/db/messages.js');
 vi.mock('../src/services/telegram.js');
