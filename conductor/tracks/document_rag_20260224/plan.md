@@ -1,15 +1,15 @@
 # Implementation Plan - Document Parsing & RAG
 
-## Phase 1: Text Extraction Service
-- [~] Task: Implement Text Extractor.
-    - [ ] Sub-task: Create `src/services/extractor.js` to handle different MIME types.
-    - [ ] Sub-task: Implement plain text extractor.
+## Phase 1: Text Extraction Service [checkpoint: 11dc121]
+- [x] Task: Implement Text Extractor.
+    - [x] Sub-task: Create `src/services/extractor.js` to handle different MIME types.
+    - [x] Sub-task: Implement plain text extractor.
     - [ ] Sub-task: Implement basic PDF text extractor (or integration).
-    - [ ] Sub-task: Write unit tests for extraction logic.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Text Extraction Service' (Protocol in workflow.md)
+    - [x] Sub-task: Write unit tests for extraction logic.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Text Extraction Service' (Protocol in workflow.md)
 
 ## Phase 2: Chunking & Indexing Pipeline
-- [ ] Task: Implement Chunking Logic.
+- [~] Task: Implement Chunking Logic.
     - [ ] Sub-task: Add `chunkText` utility to `src/utils/text.js`.
 - [ ] Task: Integrated Document Indexing.
     - [ ] Sub-task: Update `handleFile` in `src/handlers/commands.js` to trigger extraction and indexing after R2 upload.

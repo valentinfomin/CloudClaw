@@ -1,7 +1,8 @@
 export async function createFile(db, file) {
     const { user_id, r2_key, filename, content_type, size } = file;
     const query = 'INSERT INTO files (user_id, r2_key, filename, content_type, size) VALUES (?, ?, ?, ?, ?)';
-    return await db.prepare(query).bind(user_id, r2_key, filename, content_type, size).run();
+    const result = await db.prepare(query).bind(user_id, r2_key, filename, content_type, size).run();
+    return result.meta.last_row_id;
 }
 
 export async function listFiles(db, userId) {

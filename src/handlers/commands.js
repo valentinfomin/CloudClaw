@@ -6,6 +6,8 @@ import { uploadFile } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
 import { generateEmbedding, runChat, transcribeAudio } from '../services/ai.js';
 import { semanticSearch } from '../services/vector.js';
+import { extractText } from '../services/extractor.js';
+import { chunkText } from '../utils/text.js';
 
 export async function handleUpdate(c, update) {
     const env = c.env;
@@ -100,7 +102,7 @@ async function processText(c, chat_id, text, token) {
         try {
             const matches = await semanticSearch(env.VECTOR_INDEX, currentVector, chat_id);
             if (matches.length > 0) {
-                semanticContext = "Here is some relevant context from past conversations:\n";
+                semanticContext = "Here is some relevant context from past conversations and documents:\n";
                 matches.forEach(m => {
                     if (m.metadata?.content) {
                         semanticContext += `- ${m.metadata.content}\n`;
@@ -174,7 +176,7 @@ async function handleFile(c, chat_id, message, token) {
 
     await uploadFile(env.FILES, r2Key, content, mimeType);
 
-    await createFile(env.DB, {
+    const fileRecordId = await createFile(env.DB, {
         user_id: chat_id,
         r2_key: r2Key,
         filename: fileName,
@@ -182,7 +184,37 @@ async function handleFile(c, chat_id, message, token) {
         size: fileSize
     });
 
-    await sendMessage(token, chat_id, `File uploaded successfully: ${fileName}`);
+    // Integrated Document Indexing
+    try {
+        console.log("--- Extracting and Indexing Document ---");
+        const extractedText = await extractText(content, mimeType);
+        const chunks = chunkText(extractedText, 1000, 200);
+        
+        const vectorRecords = [];
+        for (let i = 0; i < chunks.length; i++) {
+            const vector = await generateEmbedding(env.AI, chunks[i]);
+            vectorRecords.push({
+                id: `doc_${fileRecordId}_${i}`,
+                values: vector,
+                metadata: { 
+                    chat_id, 
+                    file_id: fileRecordId, 
+                    source: 'document', 
+                    filename: fileName, 
+                    content: chunks[i] 
+                }
+            });
+        }
+        
+        if (vectorRecords.length > 0) {
+            await env.VECTOR_INDEX.upsert(vectorRecords);
+        }
+        console.log(`--- Indexed ${chunks.length} chunks ---`);
+        await sendMessage(token, chat_id, `File uploaded and indexed successfully: ${fileName}`);
+    } catch (idxErr) {
+        console.error("FAILED TO INDEX DOCUMENT:", idxErr.message);
+        await sendMessage(token, chat_id, `File uploaded successfully: ${fileName} (Indexing failed: ${idxErr.message})`);
+    }
 }
 
 async function handleCommand(c, chat_id, text, token) {

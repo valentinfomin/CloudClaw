@@ -17,12 +17,13 @@ describe('Files DAL', () => {
             content_type: 'image/jpeg',
             size: 1024
         };
-        await createFile(mockDB, file);
+        mockDB.run.mockResolvedValue({ meta: { last_row_id: 101 } });
+        const result = await createFile(mockDB, file);
         expect(mockDB.prepare).toHaveBeenCalledWith(
             'INSERT INTO files (user_id, r2_key, filename, content_type, size) VALUES (?, ?, ?, ?, ?)'
         );
         expect(mockDB.bind).toHaveBeenCalledWith('123', '123/test.jpg', 'test.jpg', 'image/jpeg', 1024);
-        expect(mockDB.run).toHaveBeenCalled();
+        expect(result).toBe(101);
     });
 
     it('listFiles should retrieve files for a user', async () => {
