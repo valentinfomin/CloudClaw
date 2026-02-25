@@ -2,11 +2,11 @@
 
 ## Phase 1: Core Service Development
 
-- [ ] Task: Design and implement the core data synchronization service.
-    - [ ] Sub-task: Write unit tests for the data mapping logic.
-    - [ ] Sub-task: Implement the automatic field mapping based on column names.
-    - [ ] Sub-task: Write unit tests for the error handling logic (skipping rows).
-    - [ ] Sub-task: Implement the error handling for skipping rows with errors.
+- [x] Task: Design and implement the core data synchronization service. 06e4a5d
+    - [x] Sub-task: Write unit tests for the data mapping logic.
+    - [x] Sub-task: Implement the automatic field mapping based on column names.
+    - [x] Sub-task: Write unit tests for the error handling logic (skipping rows).
+    - [x] Sub-task: Implement the error handling for skipping rows with errors.
 - [ ] Task: Develop the notification system for field mismatches.
     - [ ] Sub-task: Write tests for the simple alert notification.
     - [ ] Sub-task: Implement the simple alert mechanism.
