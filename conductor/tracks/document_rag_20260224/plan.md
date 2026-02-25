@@ -22,9 +22,9 @@
     - [x] Sub-task: Verify retrieval from both chat history and documents.
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Enhanced RAG Retrieval' (Protocol in workflow.md)
 
-## Phase 4: Finalization & Deployment
-- [~] Task: End-to-End Test.
-    - [ ] Sub-task: Upload a text file and ask a specific question.
-- [ ] Task: Deploy.
-    - [ ] Sub-task: Run `npx wrangler deploy`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Finalization & Deployment' (Protocol in workflow.md)
+## Phase 4: Finalization & Deployment [checkpoint: 26f85f7]
+- [x] Task: End-to-End Test.
+    - [x] Sub-task: Upload a text file and ask a specific question.
+- [x] Task: Deploy.
+    - [x] Sub-task: Run `npx wrangler deploy`.
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Finalization & Deployment' (Protocol in workflow.md)
