@@ -8,6 +8,7 @@ import { generateEmbedding, runChat, transcribeAudio } from '../services/ai.js';
 import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
 import { chunkText } from '../utils/text.js';
+import { analyzeImage } from '../services/gemini.js';
 
 export async function handleUpdate(c, update) {
     const env = c.env;
@@ -15,7 +16,6 @@ export async function handleUpdate(c, update) {
 
     if (!message) return c.json({ ok: true });
 
-    // Trim token to avoid accidental newlines/spaces
     const token = env.TG_TOKEN ? env.TG_TOKEN.trim() : '';
 
     if (!token) {
@@ -74,12 +74,10 @@ async function processText(c, chat_id, text, token) {
     console.log(`--- Processing Text: ${text} ---`);
     const messageId = await logMessage(env.DB, { chat_id, role: 'user', content: text });
 
-    // Generate embedding once to reuse for indexing and search
     let currentVector = null;
     try {
         currentVector = await generateEmbedding(env.AI, text);
         
-        // Index Message
         console.log("--- Indexing Message ---");
         await env.VECTOR_INDEX.upsert([
             {
@@ -96,56 +94,57 @@ async function processText(c, chat_id, text, token) {
         return await handleCommand(c, chat_id, text, token);
     }
 
-                            console.log("--- 2. Fetching Semantic Context (RAG) ---");
-                            let semanticContext = "";
-                            if (currentVector) {
-                                try {
-                                    console.log(`--- Searching for Chat ID: ${chat_id} ---`);
-                                    let matches = await semanticSearch(env.VECTOR_INDEX, currentVector, chat_id);
-                                    console.log(`--- RAG Matches Found: ${matches.length} ---`);
-                                    
-                                                    if (matches.length === 0) {
-                                                        console.log("--- FALLBACK: Searching WITHOUT chat_id filter ---");
-                                                        const globalMatches = await env.VECTOR_INDEX.query(currentVector, { topK: 10, returnMetadata: true });
-                                                        matches = (globalMatches.matches || []).filter(m => m.metadata?.chat_id === chat_id);
-                                                        console.log(`--- Fallback filtered matches: ${matches.length} ---`);
-                                                    }
-                                    
-                                                    if (matches.length > 0) {
-                                                        semanticContext = "The following information was found in your private documents and previous messages:\n";
-                                                        matches.forEach((m, idx) => {
-                                                            console.log(`Match ${idx} [Score: ${m.score}]: ${JSON.stringify(m.metadata)}`);
-                                                            if (m.metadata?.content) {
-                                                                semanticContext += `- ${m.metadata.content}\n`;
-                                                            }
-                                                        });
-                                                    }
-                                                } catch (ragErr) {
-                                                    console.error("FAILED TO FETCH SEMANTIC CONTEXT:", ragErr.message);
-                                                }
-                                            }
-                                    
-                                                    console.log("--- 3. Fetching Recent History ---");
-                                                    const history = await getChatHistory(env.DB, chat_id, 10);
-                                            
-                                                    console.log("--- 4. Calling Workers AI ---");
-                                                    const systemPrompt = `You are CloudClaw, a helpful personal assistant.
-                                            You have been given explicit permission by the user to read their private documents and provide any information they request from them.
-                                            
-                                            CONTEXT FROM USER'S DOCUMENTS:
-                                            ${semanticContext || "No document context found."}
-                                            
-                                            INSTRUCTIONS:
-                                            1. You MUST use the CONTEXT to answer the user's question.
-                                            2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.
-                                            3. Be brief and direct.`;
-                                            
-                                                    console.log(`--- Final System Prompt: --- \n${systemPrompt}\n------------------`);
-    
-            const messages = [
-                { role: 'system', content: systemPrompt },
-                ...history.map(h => ({ role: h.role, content: h.content }))
-            ];
+    console.log("--- 2. Fetching Semantic Context (RAG) ---");
+    let semanticContext = "";
+    if (currentVector) {
+        try {
+            console.log(`--- Searching for Chat ID: ${chat_id} ---`);
+            let matches = await semanticSearch(env.VECTOR_INDEX, currentVector, chat_id);
+            console.log(`--- RAG Matches Found: ${matches.length} ---`);
+            
+            if (matches.length === 0) {
+                console.log("--- FALLBACK: Searching WITHOUT chat_id filter ---");
+                const globalMatches = await env.VECTOR_INDEX.query(currentVector, { topK: 10, returnMetadata: true });
+                matches = (globalMatches.matches || []).filter(m => m.metadata?.chat_id === chat_id);
+                console.log(`--- Fallback filtered matches: ${matches.length} ---`);
+            }
+
+            if (matches.length > 0) {
+                semanticContext = "The following information was found in your private documents and previous messages:\n";
+                matches.forEach((m, idx) => {
+                    console.log(`Match ${idx} [Score: ${m.score}]: ${JSON.stringify(m.metadata)}`);
+                    if (m.metadata?.content) {
+                        semanticContext += `- ${m.metadata.content}\n`;
+                    }
+                });
+            }
+        } catch (ragErr) {
+            console.error("FAILED TO FETCH SEMANTIC CONTEXT:", ragErr.message);
+        }
+    }
+
+    console.log("--- 3. Fetching Recent History ---");
+    const history = await getChatHistory(env.DB, chat_id, 10);
+
+    console.log("--- 4. Calling Workers AI ---");
+    const systemPrompt = `You are CloudClaw, a helpful personal assistant.
+You have been given explicit permission by the user to read their private documents and provide any information they request from them.
+
+CONTEXT FROM USER'S DOCUMENTS:
+${semanticContext || "No document context found."}
+
+INSTRUCTIONS:
+1. You MUST use the CONTEXT to answer the user's question.
+2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.
+3. Be brief and direct.`;
+
+    console.log(`--- Final System Prompt: --- \n${systemPrompt}\n------------------`);
+
+    const messages = [
+        { role: 'system', content: systemPrompt },
+        ...history.map(h => ({ role: h.role, content: h.content }))
+    ];
+
     const botReply = await runChat(env.AI, '@cf/meta/llama-3-8b-instruct', messages);
 
     console.log(`--- 5. Sending to Telegram ---`);
@@ -153,7 +152,6 @@ async function processText(c, chat_id, text, token) {
     
     const assistantMsgId = await logMessage(env.DB, { chat_id, role: 'assistant', content: botReply });
 
-    // Index Assistant Reply
     if (botReply) {
         try {
             const assistantVector = await generateEmbedding(env.AI, botReply);
@@ -172,7 +170,7 @@ async function processText(c, chat_id, text, token) {
 
 async function handleFile(c, chat_id, message, token) {
     const env = c.env;
-    let fileId, fileName, mimeType, fileSize;
+    let fileId, fileName, mimeType, fileSize, isPhoto = false;
 
     if (message.document) {
         fileId = message.document.file_id;
@@ -185,6 +183,7 @@ async function handleFile(c, chat_id, message, token) {
         fileName = `photo_${fileId}.jpg`;
         mimeType = 'image/jpeg';
         fileSize = photo.file_size;
+        isPhoto = true;
     }
 
     const fileInfo = await getFileInfo(token, fileId);
@@ -203,36 +202,49 @@ async function handleFile(c, chat_id, message, token) {
         size: fileSize
     });
 
-    // Integrated Document Indexing
-    try {
-        console.log("--- Extracting and Indexing Document ---");
-        const extractedText = await extractText(content, mimeType);
-        const chunks = chunkText(extractedText, 1000, 200);
-        
-        const vectorRecords = [];
-        for (let i = 0; i < chunks.length; i++) {
-            const vector = await generateEmbedding(env.AI, chunks[i]);
-            vectorRecords.push({
-                id: `doc_${fileRecordId}_${i}`,
+    if (isPhoto) {
+        try {
+            console.log("--- Analyzing Photo with Gemini ---");
+            const description = await analyzeImage(env.GEMINI_API_KEY, content, mimeType);
+            console.log(`--- Gemini Description: ${description} ---`);
+            
+            const vector = await generateEmbedding(env.AI, description);
+            await env.VECTOR_INDEX.upsert([{
+                id: `img_${fileRecordId}`,
                 values: vector,
-                metadata: { 
-                    chat_id, 
-                    file_id: fileRecordId, 
-                    source: 'document', 
-                    filename: fileName, 
-                    content: chunks[i] 
-                }
-            });
+                metadata: { chat_id, file_id: fileRecordId, source: 'image_analysis', filename: fileName, content: description }
+            }]);
+            
+            await sendMessage(token, chat_id, `Image analyzed: ${description}`);
+        } catch (gemErr) {
+            console.error("GEMINI ERROR:", gemErr.message);
+            await sendMessage(token, chat_id, `File stored, but analysis failed: ${gemErr.message}`);
         }
-        
-        if (vectorRecords.length > 0) {
-            await env.VECTOR_INDEX.upsert(vectorRecords);
+    } else {
+        try {
+            console.log("--- Extracting and Indexing Document ---");
+            const extractedText = await extractText(content, mimeType);
+            const chunks = chunkText(extractedText, 1000, 200);
+            
+            const vectorRecords = [];
+            for (let i = 0; i < chunks.length; i++) {
+                const vector = await generateEmbedding(env.AI, chunks[i]);
+                vectorRecords.push({
+                    id: `doc_${fileRecordId}_${i}`,
+                    values: vector,
+                    metadata: { chat_id, file_id: fileRecordId, source: 'document', filename: fileName, content: chunks[i] }
+                });
+            }
+            
+            if (vectorRecords.length > 0) {
+                await env.VECTOR_INDEX.upsert(vectorRecords);
+            }
+            console.log(`--- Indexed ${chunks.length} chunks ---`);
+            await sendMessage(token, chat_id, `File uploaded and indexed successfully: ${fileName}`);
+        } catch (idxErr) {
+            console.error("FAILED TO INDEX DOCUMENT:", idxErr.message);
+            await sendMessage(token, chat_id, `File uploaded successfully: ${fileName} (Indexing failed: ${idxErr.message})`);
         }
-        console.log(`--- Indexed ${chunks.length} chunks ---`);
-        await sendMessage(token, chat_id, `File uploaded and indexed successfully: ${fileName}`);
-    } catch (idxErr) {
-        console.error("FAILED TO INDEX DOCUMENT:", idxErr.message);
-        await sendMessage(token, chat_id, `File uploaded successfully: ${fileName} (Indexing failed: ${idxErr.message})`);
     }
 }
 

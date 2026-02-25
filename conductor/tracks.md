@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Image Analysis and OCR with Google Gemini**
+- [~] **Track: Image Analysis and OCR with Google Gemini**
   *Link: [./tracks/image_analysis_20260224/](./tracks/image_analysis_20260224/)*

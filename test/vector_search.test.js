@@ -19,8 +19,8 @@ describe('Vector Search Service', () => {
         const result = await semanticSearch(mockVectorIndex, queryVector, chatId);
         
         expect(mockVectorIndex.query).toHaveBeenCalledWith(queryVector, {
-            topK: 5,
-            filter: { chat_id: chatId },
+            topK: 10,
+            filter: { chat_id: { $eq: chatId } },
             returnMetadata: true
         });
         expect(result).toHaveLength(1);
