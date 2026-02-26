@@ -7,9 +7,9 @@
 - [x] Task: Implement User Location Persistence b99390c
     - [x] Sub-task: Update `createUser` to include initial location data (defaulting to `UTC`, `Unknown`).
     - [x] Sub-task: Implement `updateUserLocation` to allow updating `timezone`, `city`, `country`.
-- [ ] Task: Update `handleUpdate` to use persisted user location
-    - [ ] Sub-task: Modify `handleUpdate` to retrieve user's stored timezone/location.
-    - [ ] Sub-task: Prioritize stored user data over Cloudflare `cf` data for `geolocation` variable.
+- [x] Task: Update `handleUpdate` to use persisted user location dcee7a5
+    - [x] Sub-task: Modify `handleUpdate` to retrieve user's stored timezone/location.
+    - [x] Sub-task: Prioritize stored user data over Cloudflare `cf` data for `geolocation` variable.
 - [ ] Task: Implement `/set_timezone` command
     - [ ] Sub-task: Add command handling in `handleCommand` for `/set_timezone <IANA_timezone>`.
     - [ ] Sub-task: Validate timezone format using `Intl.DateTimeFormat`.
