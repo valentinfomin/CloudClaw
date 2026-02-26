@@ -83,7 +83,7 @@ describe('End-to-End Document RAG Flow', () => {
         expect(VectorService.semanticSearch).toHaveBeenCalledWith(mockEnv.VECTOR_INDEX, expect.any(Array), chatId);
 
         // Verify the AI prompt contains the document content
-        const runChatArgs = AI.runChat.mock.calls[0];
+        const runChatArgs = AI.runChat.mock.calls[AI.runChat.mock.calls.length - 1];
         expect(runChatArgs[2][0].content).toContain("Rule 1: Always be helpful");
         
         expect(TelegramService.sendMessage).toHaveBeenCalledWith(expect.any(String), chatId, expect.stringContaining("The rules are"));

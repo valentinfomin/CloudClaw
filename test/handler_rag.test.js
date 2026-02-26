@@ -46,7 +46,7 @@ describe('RAG Integration', () => {
         expect(VectorService.semanticSearch).toHaveBeenCalled();
 
         // Verify AI prompt includes context
-        const runChatArgs = AI.runChat.mock.calls[0];
+        const runChatArgs = AI.runChat.mock.calls[AI.runChat.mock.calls.length - 1];
         const messages = runChatArgs[2];
         const systemMessage = messages.find(m => m.role === 'system');
         

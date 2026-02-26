@@ -14,12 +14,16 @@ describe('Telegram Webhook', () => {
         VECTOR_INDEX: { upsert: vi.fn().mockResolvedValue({}) }
     };
 
+    const mockCtx = {
+        waitUntil: vi.fn()
+    };
+
     it('should return 401 for unauthorized requests', async () => {
         const req = new Request('http://localhost/webhook', {
             method: 'POST',
             headers: { 'X-Telegram-Bot-Api-Secret-Token': 'wrong_token' }
         });
-        const res = await app.fetch(req, mockEnv);
+        const res = await app.fetch(req, mockEnv, mockCtx);
         expect(res.status).toBe(401);
     });
 
@@ -43,11 +47,11 @@ describe('Telegram Webhook', () => {
             body: JSON.stringify(update)
         });
 
-        const res = await app.fetch(req, mockEnv);
+        const res = await app.fetch(req, mockEnv, mockCtx);
         expect(res.status).toBe(200);
         expect(await res.json()).toEqual({ ok: true });
         
-        // Verify DB calls
-        expect(mockEnv.DB.prepare).toHaveBeenCalled(); // Should call createUser and logMessage
+        // Verify background processing was triggered
+        expect(mockCtx.waitUntil).toHaveBeenCalled();
     });
 });

@@ -16,9 +16,11 @@ app.post('/webhook', async (c) => {
         const update = await c.req.json();
         console.log("Update ID:", update.update_id);
 
-        // Forward processing to the command handler
-        // Ensure handleUpdate is updated to accept both context and update object
-        return await handleUpdate(c, update);
+        // Forward processing to the command handler in the background
+        c.executionCtx.waitUntil(handleUpdate(c, update));
+        
+        // Respond immediately to prevent Telegram retries
+        return c.json({ ok: true });
     } catch (err) {
         console.error("Critical Webhook Error:", err.message);
         return c.json({ ok: false, error: 'Internal Server Error' }, 500);

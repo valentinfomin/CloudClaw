@@ -77,6 +77,6 @@ describe('AI Routing Integration', () => {
         await handleUpdate({ env: mockEnv, json: vi.fn() }, update);
 
         expect(AI.runChatGemini).toHaveBeenCalled();
-        expect(AI.runChat).not.toHaveBeenCalled();
+        expect(AI.runChat).toHaveBeenCalledTimes(1); // One call for search inference
     });
 });

@@ -78,7 +78,7 @@ describe('End-to-End Image Analysis Flow', () => {
         await handleUpdate(c, questionUpdate);
 
         // Verify the AI prompt contains the image description
-        const runChatArgs = AI.runChat.mock.calls[0];
+        const runChatArgs = AI.runChat.mock.calls[AI.runChat.mock.calls.length - 1];
         expect(runChatArgs[2][0].content).toContain(imageDesc);
         
         expect(TelegramService.sendMessage).toHaveBeenCalledWith(expect.any(String), chatId, expect.stringContaining("red"));
