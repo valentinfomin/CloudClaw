@@ -20,7 +20,7 @@
 - [x] Task: Unit Tests for User Location f64391a
     - [x] Sub-task: Add unit tests for `updateUserLocation` in `test/db_users_settings.test.js`.
     - [x] Sub-task: Add unit tests for `/set_timezone` and `/set_location` commands in `test/handlers/commands.test.js`.
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Timezone and Location Handling' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Timezone and Location Handling' (Protocol in workflow.md) [checkpoint: 1446ebd]
 
 ## Phase 2: Context Injection and Formatting
 
@@ -33,7 +33,7 @@
     - [x] Sub-task: Update `performTavilySearch` in `src/services/search.js` to accept `effectiveTimezone` and pass it to Tavily if a search is performed.
 - [x] Task: Integration Test for Smart Injection a2ae572
     - [x] Sub-task: Create a new test `test/time_context_smart_injection.test.js` to verify that time context is injected only when `SEARCH_NEEDED: YES` is inferred.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Context Injection and Formatting' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Context Injection and Formatting' (Protocol in workflow.md)
 
 ## Phase 3: Deployment and Final Verification
 
