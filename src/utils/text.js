@@ -53,27 +53,37 @@ export function truncateResponse(text, limit = 2000, truncateAt = 1950) {
 export function getFormattedTimestamp(timezone = 'UTC') {
     const now = new Date();
     
-    if (timezone === 'UTC') {
-        return now.toISOString().replace(/\.\d{3}Z$/, 'Z');
-    }
-
     try {
-        // Attempt to format with the provided timezone
-        return now.toLocaleString('en-US', { timeZone: timezone, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/(\d\d)\/(\d\d)\/(\d{4}), (\d\d):(\d\d):(\d\d)/, '$3-$1-$2T$4:$5:$6') + getOffset(now, timezone);
+        const formatter = new Intl.DateTimeFormat('en-CA', { 
+            timeZone: timezone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+            timeZoneName: 'longOffset'
+        });
+        
+        const parts = formatter.formatToParts(now);
+        const map = new Map(parts.map(p => [p.type, p.value]));
+        
+        // YYYY-MM-DDTHH:MM:SS
+        const isoWithoutOffset = `${map.get('year')}-${map.get('month')}-${map.get('day')}T${map.get('hour')}:${map.get('minute')}:${map.get('second')}`;
+        
+        // longOffset is "GMT-05:00" or "GMT+03:00" or "UTC"
+        let offset = map.get('timeZoneName');
+        if (offset === 'UTC' || offset === 'GMT') {
+            offset = 'Z';
+        } else {
+            offset = offset.replace('GMT', '').replace('UTC', '');
+        }
+        
+        return isoWithoutOffset + offset;
     } catch (e) {
         console.error(`Invalid timezone '${timezone}'. Falling back to UTC.`, e);
         // Fallback to UTC if timezone is invalid
         return now.toISOString().replace(/\.\d{3}Z$/, 'Z');
     }
-}
-
-// Helper to get timezone offset in ISO 8601 format
-function getOffset(date, timezone) {
-    const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
-    const localDate = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
-    const offsetMinutes = (localDate.getTime() - utcDate.getTime()) / (1000 * 60);
-    const offsetHours = Math.abs(Math.floor(offsetMinutes / 60));
-    const remainingMinutes = Math.abs(offsetMinutes % 60);
-    const sign = offsetMinutes > 0 ? '+' : '-';
-    return `${sign}${String(offsetHours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}`;
 }

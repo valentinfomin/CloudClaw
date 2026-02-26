@@ -16,10 +16,11 @@ app.post('/webhook', async (c) => {
         const update = await c.req.json();
         console.log("Update ID:", update.update_id);
 
+        const cf = c.req.raw.cf || c.req.cf || {};
         const geolocation = {
-            timezone: c.req.cf?.timezone || 'UTC',
-            city: c.req.cf?.city || 'Unknown',
-            country: c.req.cf?.country || 'Unknown',
+            timezone: cf.timezone || 'UTC',
+            city: cf.city || 'Unknown',
+            country: cf.country || 'Unknown',
         };
 
         // Forward processing to the command handler in the background

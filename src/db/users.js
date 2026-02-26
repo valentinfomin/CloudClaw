@@ -13,3 +13,8 @@ export async function updateAIProvider(db, chat_id, provider) {
     const query = 'UPDATE users SET preferred_ai_provider = ? WHERE chat_id = ?';
     return await db.prepare(query).bind(provider, chat_id).run();
 }
+
+export async function updateUserLocation(db, chat_id, { timezone, city, country }) {
+    const query = 'UPDATE users SET timezone = ?, city = ?, country = ? WHERE chat_id = ?';
+    return await db.prepare(query).bind(timezone, city, country, chat_id).run();
+}

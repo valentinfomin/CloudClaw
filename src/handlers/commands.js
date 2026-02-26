@@ -1,5 +1,5 @@
 // src/handlers/commands.js
-import { createUser, getUser, updateAIProvider } from '../db/users.js';
+import { createUser, getUser, updateAIProvider, updateUserLocation } from '../db/users.js';
 import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
 import { uploadFile, getFile } from '../services/storage.js';
@@ -92,16 +92,37 @@ async function processText(c, chat_id, text, token, geolocation) {
         console.error("FAILED TO INDEX MESSAGE:", idxErr.message);
     }
 
+    // Fetch user settings
+    const user = await getUser(env.DB, chat_id);
+
+    // Command Handling
     if (text.startsWith('/')) {
+        if (text === '/debug_time') {
+            const effectiveTimezone = user?.timezone || geolocation?.timezone || 'UTC';
+            const effectiveCity = user?.city || geolocation?.city || 'Unknown';
+            const effectiveCountry = user?.country || geolocation?.country || 'Unknown';
+            const debugInfo = `Detected Timezone: ${geolocation?.timezone || 'N/A'}\n` +
+                              `Detected City: ${geolocation?.city || 'N/A'}\n` +
+                              `Detected Country: ${geolocation?.country || 'N/A'}\n\n` +
+                              `User Overridden Timezone: ${user?.timezone || 'None'}\n` +
+                              `User Overridden Location: ${user?.city}, ${user?.country}\n\n` +
+                              `Formatted Time (Effective): ${getFormattedTimestamp(effectiveTimezone)}\n\n` +
+                              `Raw Geolocation Object (from CF): ${JSON.stringify(geolocation)}`;
+            return await sendMessage(token, chat_id, debugInfo);
+        }
         return await handleCommand(c, chat_id, text, token);
     }
 
-    // Fetch user settings
-    const user = await getUser(env.DB, chat_id);
     const provider = user?.preferred_ai_provider || 'cloudflare';
     console.log(`--- Using Provider: ${provider} ---`);
 
+    // Use User Overrides if available
+    const effectiveTimezone = user?.timezone || geolocation?.timezone || 'UTC';
+    const effectiveCity = user?.city || geolocation?.city || 'Unknown';
+    const effectiveCountry = user?.country || geolocation?.country || 'Unknown';
+
     console.log("--- 2. Fetching Semantic Context (RAG) ---");
+    // ... (RAG matches logic remains same)
     let semanticContext = "";
     if (currentVector) {
         try {
@@ -152,7 +173,7 @@ User's Latest Message: ${text}`;
             console.log(`Performing Search for: ${searchQuery}`);
             
             if (env.TAVILY_API_KEY) {
-                const results = await performTavilySearch(env.TAVILY_API_KEY, searchQuery, getFormattedTimestamp(geolocation.timezone));
+                const results = await performTavilySearch(env.TAVILY_API_KEY, searchQuery, getFormattedTimestamp(effectiveTimezone));
                 if (results && results.length > 0) {
                     searchResultsContext = results.map(r => `Source: ${r.url}\nContent: ${r.content}`).join('\n\n');
                 } else {
@@ -170,7 +191,7 @@ User's Latest Message: ${text}`;
     const systemPrompt = `You are CloudClaw, a helpful personal assistant.
 
 CURRENT TIME AND LOCATION:
-${getFormattedTimestamp(geolocation.timezone)} (${geolocation.city}, ${geolocation.country}, Timezone: ${geolocation.timezone})
+${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})
 
 You have been given explicit permission by the user to read their private documents and provide any information they request from them.
 
@@ -363,6 +384,32 @@ async function handleCommand(c, chat_id, text, token) {
         const next = current === 'cloudflare' ? 'gemini' : 'cloudflare';
         await updateAIProvider(c.env.DB, chat_id, next);
         reply = `Preferred AI provider switched to: ${next}`;
+    } else if (text.startsWith('/set_timezone ')) {
+        const tz = text.split(' ')[1];
+        try {
+            // Validate timezone
+            new Intl.DateTimeFormat('en-US', { timeZone: tz }).format(new Date());
+            const user = await getUser(c.env.DB, chat_id);
+            await updateUserLocation(c.env.DB, chat_id, { 
+                timezone: tz, 
+                city: user?.city || 'Unknown', 
+                country: user?.country || 'Unknown' 
+            });
+            reply = `Timezone set to: ${tz}`;
+        } catch (e) {
+            reply = `Invalid timezone: ${tz}. Please use IANA format (e.g., America/Toronto).`;
+        }
+    } else if (text.startsWith('/set_location ')) {
+        const parts = text.substring(14).split(',');
+        const city = parts[0]?.trim() || 'Unknown';
+        const country = parts[1]?.trim() || 'Unknown';
+        const user = await getUser(c.env.DB, chat_id);
+        await updateUserLocation(c.env.DB, chat_id, { 
+            timezone: user?.timezone || 'UTC', 
+            city, 
+            country 
+        });
+        reply = `Location set to: ${city}, ${country}`;
     } else if (text === '/test_cf_vision') {
         const files = await listFiles(c.env.DB, chat_id);
         if (files.length === 0 || !files.find(f => f.content_type.startsWith('image'))) {
