@@ -2,8 +2,8 @@
 
 ## Phase 1: Timezone and Location Handling
 
-- [ ] Task: Update DB Schema for User Location
-    - [ ] Sub-task: Add `timezone`, `city`, `country` columns to the `users` table.
+- [x] Task: Update DB Schema for User Location acb4870
+    - [x] Sub-task: Add `timezone`, `city`, `country` columns to the `users` table.
 - [ ] Task: Implement User Location Persistence
     - [ ] Sub-task: Update `createUser` to include initial location data (defaulting to `UTC`, `Unknown`).
     - [ ] Sub-task: Implement `updateUserLocation` to allow updating `timezone`, `city`, `country`.
