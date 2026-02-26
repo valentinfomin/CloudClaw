@@ -22,6 +22,6 @@
 
 ## Phase 3: Deployment
 
-- [ ] Task: Deploy to Production.
-    - [ ] Sub-task: Run `npx wrangler deploy`.
+- [x] Task: Deploy to Production.
+    - [x] Sub-task: Run `npx wrangler deploy`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Deployment' (Protocol in workflow.md)

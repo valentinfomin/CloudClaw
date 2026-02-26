@@ -31,5 +31,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: In the system prompt for AI (Gemini/Llama), add strict instructions to save space: "Use search data as concisely as possible. Your final answer should not exceed 2000 characters unless the user requests otherwise. Always provide links in Source format."**
+- [~] **Track: In the system prompt for AI (Gemini/Llama), add strict instructions to save space: "Use search data as concisely as possible. Your final answer should not exceed 2000 characters unless the user requests otherwise. Always provide links in Source format."**
 *Link: [./tracks/ai_response_refinement_20260225/](./tracks/ai_response_refinement_20260225/)*
