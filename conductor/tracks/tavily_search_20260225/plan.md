@@ -10,7 +10,7 @@
 
 ## Phase 2: AI Agent Integration
 
-- [x] Task: Update the AI system prompt to handle search context.
+- [x] Task: Update the AI system prompt to handle search context. 1d2ca67
     - [x] Sub-task: Modify the `systemPrompt` in `src/handlers/commands.js` to instruct the AI on how to utilize search context.
 - [ ] Task: Implement automatic search inference.
     - [ ] Sub-task: Update `processText` in `src/handlers/commands.js` to determine if a search is needed before calling the main AI engine. (This might involve a preliminary, fast AI call to classify the intent).
