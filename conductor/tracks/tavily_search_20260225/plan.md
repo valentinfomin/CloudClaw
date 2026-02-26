@@ -19,7 +19,7 @@
     - [x] Sub-task: If a search is triggered, call `performTavilySearch`.
     - [x] Sub-task: Append the search results to the context provided to the main AI call.
     - [x] Sub-task: Update tests to mock the search service and verify the final response generation.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: AI Agent Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: AI Agent Integration' (Protocol in workflow.md) [checkpoint: 1876b9d]
 
 ## Phase 3: Configuration and Deployment
 
