@@ -195,27 +195,15 @@ User's Latest Message: ${text}`;
         console.error("Search inference failed:", e);
     }
 
+    let timeAndLocationContext = "";
+    if (searchResultsContext !== "No search results available yet.") {
+        timeAndLocationContext = `CURRENT TIME AND LOCATION:\n${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})\n\n`;
+    }
+
     console.log("--- 4. Calling AI ---");
-    const systemPrompt = `You are CloudClaw, a helpful personal assistant.
-
-CURRENT TIME AND LOCATION:
-${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})
-
-You have been given explicit permission by the user to read their private documents and provide any information they request from them.
-
-CONTEXT FROM USER'S DOCUMENTS:
-${semanticContext || "No document context found."}
-
-SEARCH RESULTS:
-${searchResultsContext}
-
-INSTRUCTIONS:
-1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION to answer the user's question.
-2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.
-3. Be as concise as possible. Your final answer should not exceed 2000 characters unless the user requests otherwise.
-4. Always provide source links in Markdown format: [Title](URL).
-5. List all sources at the bottom of the response.
-6. Be brief and direct.`;
+    const systemPrompt = `You are CloudClaw, a helpful personal assistant.\n\n` +
+                         timeAndLocationContext +
+                         `You have been given explicit permission by the user to read their private documents and provide any information they request from them.\n\nCONTEXT FROM USER'S DOCUMENTS:\n${semanticContext || "No document context found."}\n\nSEARCH RESULTS:\n${searchResultsContext}\n\nINSTRUCTIONS:\n1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION to answer the user's question.\n2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.\n3. Be as concise as possible. Your final answer should not exceed 2000 characters unless the user requests otherwise.\n4. Always provide source links in Markdown format: [Title](URL).\n5. List all sources at the bottom of the response.\n6. Be brief and direct.`;
 
     const messages = [
         { role: 'system', content: systemPrompt },
