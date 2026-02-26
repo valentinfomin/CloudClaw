@@ -27,8 +27,8 @@
 - [x] Task: Modify `getFormattedTimestamp` a87337a
     - [x] Sub-task: Enhance `getFormattedTimestamp` in `src/utils/text.js` to correctly format ISO 8601 with offset for user-defined timezones, falling back to UTC.
     - [x] Sub-task: Update relevant unit tests in `test/text_utils.test.js`.
-- [ ] Task: Update AI System Prompt for Smart Injection
-    - [ ] Sub-task: Modify `systemPrompt` in `src/handlers/commands.js` to dynamically include `CURRENT TIME AND LOCATION` only when search is performed.
+- [x] Task: Update AI System Prompt for Smart Injection a295800
+    - [x] Sub-task: Modify `systemPrompt` in `src/handlers/commands.js` to dynamically include `CURRENT TIME AND LOCATION` only when search is performed.
 - [ ] Task: Update Tavily Search with Time Context
     - [ ] Sub-task: Update `performTavilySearch` in `src/services/search.js` to accept `effectiveTimezone` and pass it to Tavily if a search is performed.
 - [ ] Task: Integration Test for Smart Injection
