@@ -10,6 +10,7 @@ import { extractText } from '../services/extractor.js';
 import { chunkText } from '../utils/text.js';
 import { analyzeImage } from '../services/gemini.js';
 import { mapData } from '../services/import_service.js';
+import { performTavilySearch } from '../services/search.js';
 
 export async function handleUpdate(c, update) {
     const env = c.env;
@@ -129,6 +130,42 @@ async function processText(c, chat_id, text, token) {
     console.log("--- 3. Fetching Recent History ---");
     const history = await getChatHistory(env.DB, chat_id, 10);
 
+    console.log("--- 3.5 Web Search Inference ---");
+    let searchResultsContext = "No search results available yet.";
+    try {
+        const inferencePrompt = `Determine if a real-time web search is needed to answer the user's latest message.
+Reply ONLY with "SEARCH_NEEDED: YES: <search query>" or "SEARCH_NEEDED: NO".
+Consider the context. If the answer requires current events, real-time data (like stock prices, weather), or specific recent facts not likely to be in standard training data, say YES.
+
+Chat History:
+${history.map(h => `${h.role}: ${h.content}`).join('\n')}
+
+User's Latest Message: ${text}`;
+        
+        // Fast inference call
+        const inferenceResult = await runChat(env.AI, PREFERRED_CHAT_MODELS, [{ role: 'system', content: inferencePrompt }]);
+        console.log(`Search Inference: ${inferenceResult}`);
+
+        if (inferenceResult.includes("SEARCH_NEEDED: YES")) {
+            const queryMatch = inferenceResult.match(/SEARCH_NEEDED: YES:?\s*(.*)/i);
+            const searchQuery = queryMatch && queryMatch[1] ? queryMatch[1].trim() : text;
+            console.log(`Performing Search for: ${searchQuery}`);
+            
+            if (env.TAVILY_API_KEY) {
+                const results = await performTavilySearch(env.TAVILY_API_KEY, searchQuery);
+                if (results && results.length > 0) {
+                    searchResultsContext = results.map(r => `Source: ${r.url}\nContent: ${r.content}`).join('\n\n');
+                } else {
+                    searchResultsContext = "Search was performed but returned no relevant results.";
+                }
+            } else {
+                 console.log("Tavily API key not found in environment.");
+            }
+        }
+    } catch (e) {
+        console.error("Search inference failed:", e);
+    }
+
     console.log("--- 4. Calling AI ---");
     const systemPrompt = `You are CloudClaw, a helpful personal assistant.
 You have been given explicit permission by the user to read their private documents and provide any information they request from them.
@@ -137,7 +174,7 @@ CONTEXT FROM USER'S DOCUMENTS:
 ${semanticContext || "No document context found."}
 
 SEARCH RESULTS:
-${"No search results available yet."}
+${searchResultsContext}
 
 INSTRUCTIONS:
 1. You MUST use the CONTEXT and SEARCH RESULTS to answer the user's question.
