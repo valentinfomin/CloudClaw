@@ -4,9 +4,9 @@
 
 - [x] Task: Update DB Schema for User Location acb4870
     - [x] Sub-task: Add `timezone`, `city`, `country` columns to the `users` table.
-- [ ] Task: Implement User Location Persistence
-    - [ ] Sub-task: Update `createUser` to include initial location data (defaulting to `UTC`, `Unknown`).
-    - [ ] Sub-task: Implement `updateUserLocation` to allow updating `timezone`, `city`, `country`.
+- [x] Task: Implement User Location Persistence b99390c
+    - [x] Sub-task: Update `createUser` to include initial location data (defaulting to `UTC`, `Unknown`).
+    - [x] Sub-task: Implement `updateUserLocation` to allow updating `timezone`, `city`, `country`.
 - [ ] Task: Update `handleUpdate` to use persisted user location
     - [ ] Sub-task: Modify `handleUpdate` to retrieve user's stored timezone/location.
     - [ ] Sub-task: Prioritize stored user data over Cloudflare `cf` data for `geolocation` variable.
