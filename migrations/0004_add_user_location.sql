@@ -1,0 +1,4 @@
+-- Migration number: 0004 	 2026-02-27T12:06:00.000Z
+ALTER TABLE users ADD COLUMN timezone TEXT DEFAULT 'UTC';
+ALTER TABLE users ADD COLUMN city TEXT DEFAULT 'Unknown';
+ALTER TABLE users ADD COLUMN country TEXT DEFAULT 'Unknown';
