@@ -23,3 +23,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: I need to add a data import system. This system should be able to handle ongoing, real-time data synchronization. The field mapping should be automatic, based on matching column names. If there are errors in the data, the system should skip those rows and continue the import. If a field name in the source does not match a field in our data model, the system should provide a notification. This feature is valuable but not critical.**
 *Link: [./tracks/data_import_system_20260225/](./tracks/data_import_system_20260225/)*
+
+---
+
+- [ ] **Track: Use Tavily for search. The AI should automatically infer when to search, use Cloudflare Secrets for the API key, and provide an AI-generated summary of the results.**
+*Link: [./tracks/tavily_search_20260225/](./tracks/tavily_search_20260225/)*
