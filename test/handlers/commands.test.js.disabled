@@ -1,0 +1,98 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { handleCommand } from '../src/handlers/commands.js';
+import * as usersDb from '../src/db/users.js';
+import * as telegramService from '../src/services/telegram.js';
+
+vi.mock('../src/db/users.js');
+vi.mock('../src/services/telegram.js');
+
+describe('Command Handler', () => {
+    const mockEnv = {
+        TG_TOKEN: 'test_token',
+        DB: {}
+    };
+    const mockC = {
+        env: mockEnv,
+        json: vi.fn()
+    };
+    const chat_id = '123';
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        usersDb.getUser.mockResolvedValue({});
+        usersDb.updateUserLocation.mockResolvedValue({});
+        telegramService.sendMessage.mockResolvedValue({});
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('should handle /set_timezone command successfully', async () => {
+        const text = '/set_timezone America/New_York';
+        const token = 'test_token';
+
+        await handleCommand(mockC, chat_id, text, token);
+
+        expect(usersDb.updateUserLocation).toHaveBeenCalledWith(
+            mockEnv.DB, 
+            chat_id, 
+            { timezone: 'America/New_York', city: undefined, country: undefined }
+        );
+        expect(telegramService.sendMessage).toHaveBeenCalledWith(
+            token,
+            chat_id,
+            'Timezone set to: America/New_York'
+        );
+    });
+
+    it('should handle /set_timezone command with invalid timezone', async () => {
+        const text = '/set_timezone Invalid/Timezone';
+        const token = 'test_token';
+
+        await handleCommand(mockC, chat_id, text, token);
+
+        expect(usersDb.updateUserLocation).not.toHaveBeenCalled();
+        expect(telegramService.sendMessage).toHaveBeenCalledWith(
+            token,
+            chat_id,
+            'Invalid timezone: Invalid/Timezone. Please use IANA format (e.g., America/Toronto).'
+        );
+    });
+
+    it('should handle /set_location command successfully', async () => {
+        const text = '/set_location London,UK';
+        const token = 'test_token';
+
+        await handleCommand(mockC, chat_id, text, token);
+
+        expect(usersDb.updateUserLocation).toHaveBeenCalledWith(
+            mockEnv.DB, 
+            chat_id, 
+            { timezone: undefined, city: 'London', country: 'UK' }
+        );
+        expect(telegramService.sendMessage).toHaveBeenCalledWith(
+            token,
+            chat_id,
+            'Location set to: London, UK'
+        );
+    });
+
+    it('should handle /set_location command with partial input', async () => {
+        const text = '/set_location Tokyo';
+        const token = 'test_token';
+
+        await handleCommand(mockC, chat_id, text, token);
+
+        expect(usersDb.updateUserLocation).toHaveBeenCalledWith(
+            mockEnv.DB, 
+            chat_id, 
+            { timezone: undefined, city: 'Tokyo', country: 'Unknown' }
+        );
+        expect(telegramService.sendMessage).toHaveBeenCalledWith(
+            token,
+            chat_id,
+            'Location set to: Tokyo, Unknown'
+        );
+    });
+});

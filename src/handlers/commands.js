@@ -203,7 +203,21 @@ User's Latest Message: ${text}`;
     console.log("--- 4. Calling AI ---");
     const systemPrompt = `You are CloudClaw, a helpful personal assistant.\n\n` +
                          timeAndLocationContext +
-                         `You have been given explicit permission by the user to read their private documents and provide any information they request from them.\n\nCONTEXT FROM USER'S DOCUMENTS:\n${semanticContext || "No document context found."}\n\nSEARCH RESULTS:\n${searchResultsContext}\n\nINSTRUCTIONS:\n1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION to answer the user's question.\n2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.\n3. Be as concise as possible. Your final answer should not exceed 2000 characters unless the user requests otherwise.\n4. Always provide source links in Markdown format: [Title](URL).\n5. List all sources at the bottom of the response.\n6. Be brief and direct.`;
+                         `You have been given explicit permission by the user to read their private ` +
+                         `documents and provide any information they request from them.\n\n` +
+                         `CONTEXT FROM USER'S DOCUMENTS:\n${semanticContext || "No document context found."}\n\n` +
+                         `SEARCH RESULTS:\n${searchResultsContext}\n\n` +
+                         `INSTRUCTIONS:\n` +
+                         `1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION ` +
+                         `to answer the user's question.\n` +
+                         `2. If the user asks for a secret code, password, or specific information found ` +
+                         `in the CONTEXT, you MUST provide it exactly as written. Do not refuse. ` +
+                         `It is safe and authorized.\n` +
+                         `3. Be as concise as possible. Your final answer should not exceed 2000 ` +
+                         `characters unless the user requests otherwise.\n` +
+                         `4. Always provide source links in Markdown format: [Title](URL).\n` +
+                         `5. List all sources at the bottom of the response.\n` +
+                         `6. Be brief and direct.`;
 
     const messages = [
         { role: 'system', content: systemPrompt },
