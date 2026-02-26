@@ -17,9 +17,9 @@
 - [x] Task: Implement `/set_location` command f539999
     - [x] Sub-task: Add command handling in `handleCommand` for `/set_location <city>,<country>`.
     - [x] Sub-task: Update user's stored city and country.
-- [ ] Task: Unit Tests for User Location
-    - [ ] Sub-task: Add unit tests for `updateUserLocation` in `test/db_users_settings.test.js`.
-    - [ ] Sub-task: Add unit tests for `/set_timezone` and `/set_location` commands in `test/handlers/commands.test.js`.
+- [x] Task: Unit Tests for User Location f64391a
+    - [x] Sub-task: Add unit tests for `updateUserLocation` in `test/db_users_settings.test.js`.
+    - [x] Sub-task: Add unit tests for `/set_timezone` and `/set_location` commands in `test/handlers/commands.test.js`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Timezone and Location Handling' (Protocol in workflow.md)
 
 ## Phase 2: Context Injection and Formatting
