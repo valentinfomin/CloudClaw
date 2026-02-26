@@ -12,7 +12,7 @@ import { analyzeImage } from '../services/gemini.js';
 import { mapData } from '../services/import_service.js';
 import { performTavilySearch } from '../services/search.js';
 
-export async function handleUpdate(c, update) {
+export async function handleUpdate(c, update, geolocation) {
     const env = c.env;
     const message = update.message;
 

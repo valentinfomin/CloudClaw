@@ -16,8 +16,14 @@ app.post('/webhook', async (c) => {
         const update = await c.req.json();
         console.log("Update ID:", update.update_id);
 
+        const geolocation = {
+            timezone: c.req.cf?.timezone || 'UTC',
+            city: c.req.cf?.city || 'Unknown',
+            country: c.req.cf?.country || 'Unknown',
+        };
+
         // Forward processing to the command handler in the background
-        c.executionCtx.waitUntil(handleUpdate(c, update));
+        c.executionCtx.waitUntil(handleUpdate(c, update, geolocation));
         
         // Respond immediately to prevent Telegram retries
         return c.json({ ok: true });
