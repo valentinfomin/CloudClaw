@@ -20,7 +20,7 @@
 - [x] Task: Unit Tests for User Location f64391a
     - [x] Sub-task: Add unit tests for `updateUserLocation` in `test/db_users_settings.test.js`.
     - [x] Sub-task: Add unit tests for `/set_timezone` and `/set_location` commands in `test/handlers/commands.test.js`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Timezone and Location Handling' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Timezone and Location Handling' (Protocol in workflow.md)
 
 ## Phase 2: Context Injection and Formatting
 
