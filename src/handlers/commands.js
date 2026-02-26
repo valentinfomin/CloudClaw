@@ -136,8 +136,11 @@ You have been given explicit permission by the user to read their private docume
 CONTEXT FROM USER'S DOCUMENTS:
 ${semanticContext || "No document context found."}
 
+SEARCH RESULTS:
+${"No search results available yet."}
+
 INSTRUCTIONS:
-1. You MUST use the CONTEXT to answer the user's question.
+1. You MUST use the CONTEXT and SEARCH RESULTS to answer the user's question.
 2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.
 3. Be brief and direct.`;
 
