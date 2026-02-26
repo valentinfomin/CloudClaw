@@ -10,10 +10,10 @@
 - [x] Task: Update `handleUpdate` to use persisted user location dcee7a5
     - [x] Sub-task: Modify `handleUpdate` to retrieve user's stored timezone/location.
     - [x] Sub-task: Prioritize stored user data over Cloudflare `cf` data for `geolocation` variable.
-- [ ] Task: Implement `/set_timezone` command
-    - [ ] Sub-task: Add command handling in `handleCommand` for `/set_timezone <IANA_timezone>`.
-    - [ ] Sub-task: Validate timezone format using `Intl.DateTimeFormat`.
-    - [ ] Sub-task: Update user's stored timezone.
+- [x] Task: Implement `/set_timezone` command 5057e39
+    - [x] Sub-task: Add command handling in `handleCommand` for `/set_timezone <IANA_timezone>`.
+    - [x] Sub-task: Validate timezone format using `Intl.DateTimeFormat`.
+    - [x] Sub-task: Update user's stored timezone.
 - [ ] Task: Implement `/set_location` command
     - [ ] Sub-task: Add command handling in `handleCommand` for `/set_location <city>,<country>`.
     - [ ] Sub-task: Update user's stored city and country.
