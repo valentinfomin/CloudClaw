@@ -12,7 +12,7 @@ import { analyzeImage } from '../services/gemini.js';
 import { mapData } from '../services/import_service.js';
 import { performTavilySearch } from '../services/search.js';
 
-export async function handleUpdate(c, update, geolocation) {
+export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', city: 'Unknown', country: 'Unknown' }) {
     const env = c.env;
     const message = update.message;
 

@@ -55,7 +55,7 @@ describe('Search Inference Integration', () => {
 
         await handleUpdate(c, update);
 
-        expect(searchService.performTavilySearch).toHaveBeenCalledWith('mock_tavily', expect.any(String));
+        expect(searchService.performTavilySearch).toHaveBeenCalledWith('mock_tavily', expect.any(String), expect.any(String));
         
         // Verify that the final AI call included the search results in the system prompt
         const lastAiCallArgs = aiService.runChat.mock.calls[1];
