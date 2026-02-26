@@ -12,10 +12,10 @@
 
 - [x] Task: Update the AI system prompt to handle search context. 1d2ca67
     - [x] Sub-task: Modify the `systemPrompt` in `src/handlers/commands.js` to instruct the AI on how to utilize search context.
-- [~] Task: Implement automatic search inference.
+- [x] Task: Implement automatic search inference. 57b99be
     - [x] Sub-task: Update `processText` in `src/handlers/commands.js` to determine if a search is needed before calling the main AI engine. (This might involve a preliminary, fast AI call to classify the intent).
     - [x] Sub-task: Write integration tests to verify the search inference logic.
-- [~] Task: Integrate search results into the final AI response.
+- [x] Task: Integrate search results into the final AI response. 57b99be
     - [x] Sub-task: If a search is triggered, call `performTavilySearch`.
     - [x] Sub-task: Append the search results to the context provided to the main AI call.
     - [x] Sub-task: Update tests to mock the search service and verify the final response generation.
