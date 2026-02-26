@@ -2,10 +2,10 @@
 
 ## Phase 1: Tavily Service Integration
 
-- [ ] Task: Create Tavily search service module.
-    - [ ] Sub-task: Create a new file `src/services/search.js`.
-    - [ ] Sub-task: Implement `performTavilySearch` function using `fetch` to interact with the Tavily API.
-    - [ ] Sub-task: Write unit tests in `test/search.test.js` to verify API interaction and error handling.
+- [x] Task: Create Tavily search service module. 0d3fa7e
+    - [x] Sub-task: Create a new file `src/services/search.js`.
+    - [x] Sub-task: Implement `performTavilySearch` function using `fetch` to interact with the Tavily API.
+    - [x] Sub-task: Write unit tests in `test/search.test.js` to verify API interaction and error handling.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Tavily Service Integration' (Protocol in workflow.md)
 
 ## Phase 2: AI Agent Integration
