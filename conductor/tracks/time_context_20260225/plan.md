@@ -22,9 +22,9 @@
 
 ## Phase 3: Verification & Deployment
 
-- [ ] Task: Integration Testing.
-    - [ ] Sub-task: Create or update a test (e.g., `test/time_context.test.js`) to verify that the AI receives the correct time in its system prompt.
-    - [ ] Sub-task: Run full test suite: `npm test`.
-- [ ] Task: Deploy to Production.
-    - [ ] Sub-task: Run `npx wrangler deploy`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Verification & Deployment' (Protocol in workflow.md)
+- [x] Task: Integration Testing. f118e3e
+    - [x] Sub-task: Create or update a test (e.g., `test/time_context.test.js`) to verify that the AI receives the correct time in its system prompt.
+    - [x] Sub-task: Run full test suite: `npm test`.
+- [x] Task: Deploy to Production. d6760a7
+    - [x] Sub-task: Run `npx wrangler deploy`.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Verification & Deployment' (Protocol in workflow.md) [checkpoint: a87337a]
