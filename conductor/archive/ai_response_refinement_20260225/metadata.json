@@ -1,0 +1,8 @@
+{
+  "track_id": "ai_response_refinement_20260225",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-25T17:20:00Z",
+  "updated_at": "2026-02-25T17:20:00Z",
+  "description": "In the system prompt for AI (Gemini/Llama), add strict instructions to save space: "Use search data as concisely as possible. Your final answer should not exceed 2000 characters unless the user requests otherwise. Always provide links in Source format.""
+}

@@ -29,7 +29,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Use Tavily for search. The AI should automatically infer when to search, use Cloudflare Secrets for the API key, and provide an AI-generated summary of the results.**
 *Link: [./tracks/tavily_search_20260225/](./tracks/tavily_search_20260225/)*
 
----
-
-- [x] **Track: In the system prompt for AI (Gemini/Llama), add strict instructions to save space: "Use search data as concisely as possible. Your final answer should not exceed 2000 characters unless the user requests otherwise. Always provide links in Source format."**
-*Link: [./tracks/ai_response_refinement_20260225/](./tracks/ai_response_refinement_20260225/)*
