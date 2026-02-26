@@ -1,0 +1,8 @@
+{
+  "track_id": "smart_time_location_20260227",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-27T12:06:00Z",
+  "updated_at": "2026-02-27T12:06:00Z",
+  "description": "Implement a smart time and location context injection system for AI, allowing manual overrides and ensuring precise ISO 8601 formatting, while keeping debug visibility optional."
+}
