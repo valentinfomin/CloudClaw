@@ -43,3 +43,37 @@ export function truncateResponse(text, limit = 2000, truncateAt = 1950) {
     const notice = "... [Truncated due to length]";
     return text.substring(0, truncateAt) + notice;
 }
+
+/**
+ * Get current timestamp formatted in ISO 8601 with timezone offset.
+ * Defaults to UTC if no timezone is provided.
+ * @param {string} timezone - IANA timezone name (e.g., 'Europe/Moscow', 'America/New_York')
+ * @returns {string}
+ */
+export function getFormattedTimestamp(timezone = 'UTC') {
+    const now = new Date();
+    
+    if (timezone === 'UTC') {
+        return now.toISOString().replace(/\.\d{3}Z$/, 'Z');
+    }
+
+    try {
+        // Attempt to format with the provided timezone
+        return now.toLocaleString('en-US', { timeZone: timezone, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/(\d\d)\/(\d\d)\/(\d{4}), (\d\d):(\d\d):(\d\d)/, '$3-$1-$2T$4:$5:$6') + getOffset(now, timezone);
+    } catch (e) {
+        console.error(`Invalid timezone '${timezone}'. Falling back to UTC.`, e);
+        // Fallback to UTC if timezone is invalid
+        return now.toISOString().replace(/\.\d{3}Z$/, 'Z');
+    }
+}
+
+// Helper to get timezone offset in ISO 8601 format
+function getOffset(date, timezone) {
+    const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+    const localDate = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
+    const offsetMinutes = (localDate.getTime() - utcDate.getTime()) / (1000 * 60);
+    const offsetHours = Math.abs(Math.floor(offsetMinutes / 60));
+    const remainingMinutes = Math.abs(offsetMinutes % 60);
+    const sign = offsetMinutes > 0 ? '+' : '-';
+    return `${sign}${String(offsetHours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}`;
+}

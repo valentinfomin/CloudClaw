@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { chunkText, truncateResponse } from '../src/utils/text.js';
+import { describe, it, expect, vi } from 'vitest';
+import { chunkText, truncateResponse, getFormattedTimestamp } from '../src/utils/text.js';
 
 describe('Text Utilities', () => {
     describe('chunkText', () => {
@@ -45,6 +45,35 @@ describe('Text Utilities', () => {
         it('should handle empty or null text', () => {
             expect(truncateResponse('')).toBe('');
             expect(truncateResponse(null)).toBe(null);
+        });
+    });
+
+    describe('getFormattedTimestamp', () => {
+        it('should return ISO 8601 format for UTC', () => {
+            const now = new Date('2026-02-25T14:30:00.000Z');
+            vi.setSystemTime(now);
+            expect(getFormattedTimestamp('UTC')).toBe('2026-02-25T14:30:00Z');
+        });
+
+        it('should return ISO 8601 format for a specific timezone', () => {
+            const now = new Date('2026-02-25T14:30:00.000Z'); // UTC time
+            vi.setSystemTime(now);
+            // Europe/Moscow is UTC+3
+            expect(getFormattedTimestamp('Europe/Moscow')).toBe('2026-02-25T17:30:00+03:00');
+        });
+
+        it('should fallback to UTC for invalid timezone', () => {
+            const now = new Date('2026-02-25T14:30:00.000Z');
+            vi.setSystemTime(now);
+            expect(getFormattedTimestamp('Invalid/Timezone')).toBe('2026-02-25T14:30:00Z');
+        });
+
+        it('should handle different date for ISO 8601 with offset', () => {
+            const now = new Date('2026-02-25T23:00:00.000Z'); // 11 PM UTC
+            vi.setSystemTime(now);
+            // Australia/Sydney is UTC+11 (during standard time, without DST changes)
+            // So 11 PM UTC on 25th Feb is 10 AM on 26th Feb in Sydney
+            expect(getFormattedTimestamp('Australia/Sydney')).toBe('2026-02-26T10:00:00+11:00');
         });
     });
 });
