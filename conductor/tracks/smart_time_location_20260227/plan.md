@@ -1,6 +1,6 @@
 # Implementation Plan: Local Time Context for AI and Search
 
-## Phase 1: Timezone and Location Handling
+## Phase 1: Timezone and Location Handling [checkpoint: 1446ebd]
 
 - [x] Task: Update DB Schema for User Location acb4870
     - [x] Sub-task: Add `timezone`, `city`, `country` columns to the `users` table.
