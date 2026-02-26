@@ -16,6 +16,7 @@ CloudClaw is a highly responsive AI agent deployed on Cloudflare Workers, adheri
 - **Data Import:** Enable real-time data synchronization with automatic field mapping and error handling.
 - **Web Search:** Integrated Tavily Search for real-time information retrieval and summarization.
 - **AI Processing:** Use Cloudflare Workers AI (`@cf/meta/llama-3-8b-instruct`) for reasoning and generation.
+- **Response Optimization:** Automatic soft-truncation and strict conciseness rules for all AI output.
 
 ## Infrastructure & Architecture
 - **Compute:** Cloudflare Workers

@@ -16,6 +16,11 @@
 -   **Storage (Files):** Prepare `PUT` requests for R2.
 -   **Status:** Analyze `wrangler.toml` configuration.
 
+## Communication Standards
+- **Conciseness:** Responses MUST be as brief as possible, especially when summarizing.
+- **Length Constraint:** Standard AI responses MUST NOT exceed 2000 characters.
+- **Source Formatting:** Web sources MUST be provided as Markdown links `[Title](URL)` and listed at the bottom of the response.
+
 ## Output Format
 -   `[ACTION]`: Describe what you are doing.
 -   `[RESULT]`: The final output or code.
