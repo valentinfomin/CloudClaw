@@ -1,0 +1,8 @@
+{
+  "track_id": "time_context_20260225",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-25T17:35:00Z",
+  "updated_at": "2026-02-25T17:35:00Z",
+  "description": "Add local date/time to search context for Tavily using Cloudflare geolocation data."
+}
