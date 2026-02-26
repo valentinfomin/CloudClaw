@@ -26,6 +26,6 @@
 - [x] Task: Configure environment variables. 4629e9b
     - [x] Sub-task: Add `TAVILY_API_KEY` to the local `.dev.vars` file (for local testing).
     - [x] Sub-task: Add instructions to README for setting the secret in Cloudflare.
-- [ ] Task: Deploy to production.
-    - [ ] Sub-task: Run `npx wrangler deploy`.
+- [x] Task: Deploy to production.
+    - [x] Sub-task: Run `npx wrangler deploy`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Configuration and Deployment' (Protocol in workflow.md)
