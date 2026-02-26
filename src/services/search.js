@@ -1,8 +1,13 @@
 // src/services/search.js
 
-export async function performTavilySearch(apiKey, query) {
+export async function performTavilySearch(apiKey, query, currentDate = null) {
     if (!apiKey) {
         throw new Error('Tavily API key is missing');
+    }
+
+    const body = { query: query };
+    if (currentDate) {
+        body.publish_date = { before: currentDate }; // Use 'before' to guide Tavily to recent results
     }
 
     const response = await fetch('https://api.tavily.com/search', {
@@ -11,7 +16,7 @@ export async function performTavilySearch(apiKey, query) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`
         },
-        body: JSON.stringify({ query: query })
+        body: JSON.stringify(body)
     });
 
     if (!response.ok) {

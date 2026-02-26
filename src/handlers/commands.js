@@ -7,7 +7,7 @@ import { createFile, listFiles } from '../db/files.js';
 import { generateEmbedding, runChat, runChatGemini, transcribeAudio, analyzeImageCloudflare, PREFERRED_CHAT_MODELS } from '../services/ai.js';
 import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
-import { chunkText, truncateResponse } from '../utils/text.js';
+import { chunkText, truncateResponse, getFormattedTimestamp } from '../utils/text.js';
 import { analyzeImage } from '../services/gemini.js';
 import { mapData } from '../services/import_service.js';
 import { performTavilySearch } from '../services/search.js';
@@ -57,7 +57,7 @@ export async function handleUpdate(c, update, geolocation) {
         // Handle Text Pipeline
         if (!text) return c.json({ ok: true });
         
-        await processText(c, chat_id, text, token);
+        await processText(c, chat_id, text, token, geolocation);
 
     } catch (err) {
         console.error("ERROR IN HANDLER:", err);
@@ -71,7 +71,7 @@ export async function handleUpdate(c, update, geolocation) {
     return c.json({ ok: true });
 }
 
-async function processText(c, chat_id, text, token) {
+async function processText(c, chat_id, text, token, geolocation) {
     const env = c.env;
     console.log(`--- Processing Text: ${text} ---`);
     const messageId = await logMessage(env.DB, { chat_id, role: 'user', content: text });
@@ -152,7 +152,7 @@ User's Latest Message: ${text}`;
             console.log(`Performing Search for: ${searchQuery}`);
             
             if (env.TAVILY_API_KEY) {
-                const results = await performTavilySearch(env.TAVILY_API_KEY, searchQuery);
+                const results = await performTavilySearch(env.TAVILY_API_KEY, searchQuery, getFormattedTimestamp(geolocation.timezone));
                 if (results && results.length > 0) {
                     searchResultsContext = results.map(r => `Source: ${r.url}\nContent: ${r.content}`).join('\n\n');
                 } else {
@@ -168,6 +168,10 @@ User's Latest Message: ${text}`;
 
     console.log("--- 4. Calling AI ---");
     const systemPrompt = `You are CloudClaw, a helpful personal assistant.
+
+CURRENT TIME AND LOCATION:
+${getFormattedTimestamp(geolocation.timezone)} (${geolocation.city}, ${geolocation.country}, Timezone: ${geolocation.timezone})
+
 You have been given explicit permission by the user to read their private documents and provide any information they request from them.
 
 CONTEXT FROM USER'S DOCUMENTS:
@@ -177,7 +181,7 @@ SEARCH RESULTS:
 ${searchResultsContext}
 
 INSTRUCTIONS:
-1. You MUST use the CONTEXT and SEARCH RESULTS to answer the user's question.
+1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION to answer the user's question.
 2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.
 3. Be as concise as possible. Your final answer should not exceed 2000 characters unless the user requests otherwise.
 4. Always provide source links in Markdown format: [Title](URL).
