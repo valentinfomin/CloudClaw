@@ -3,11 +3,13 @@ import { handleUpdate } from '../src/handlers/commands.js';
 import * as TelegramService from '../src/services/telegram.js';
 import * as StorageService from '../src/services/storage.js';
 import * as FileDAL from '../src/db/files.js';
+import * as UserDAL from '../src/db/users.js';
 
 // Mock services
 vi.mock('../src/services/telegram.js');
 vi.mock('../src/services/storage.js');
 vi.mock('../src/db/files.js');
+vi.mock('../src/db/users.js');
 
 describe('File Upload Handler', () => {
     const mockEnv = {
@@ -42,6 +44,7 @@ describe('File Upload Handler', () => {
         TelegramService.sendMessage.mockResolvedValue({});
         StorageService.uploadFile.mockResolvedValue({});
         FileDAL.createFile.mockResolvedValue({});
+        UserDAL.getUser.mockResolvedValue({ chat_id: '123' }); // Add this mock
 
         const c = {
             env: mockEnv,

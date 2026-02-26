@@ -35,6 +35,14 @@ export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', c
     try {
         console.log("--- 1. Saving User ---");
         await createUser(env.DB, userData);
+        const user = await getUser(env.DB, chat_id);
+
+        // Prioritize user's stored location, fallback to Cloudflare's geolocation
+        const effectiveGeolocation = {
+            timezone: user?.timezone && user.timezone !== 'UTC' ? user.timezone : geolocation.timezone,
+            city: user?.city && user.city !== 'Unknown' ? user.city : geolocation.city,
+            country: user?.country && user.country !== 'Unknown' ? user.country : geolocation.country
+        };
 
         // Handle File (Document or Photo)
         if (message.document || message.photo) {
@@ -57,7 +65,7 @@ export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', c
         // Handle Text Pipeline
         if (!text) return c.json({ ok: true });
         
-        await processText(c, chat_id, text, token, geolocation);
+        await processText(c, chat_id, text, token, effectiveGeolocation);
 
     } catch (err) {
         console.error("ERROR IN HANDLER:", err);

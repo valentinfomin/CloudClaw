@@ -15,9 +15,9 @@ describe('D1 Data Access Layer', () => {
             const user = { chat_id: '123', username: 'testuser', first_name: 'Test' };
             await createUser(mockDB, user);
             expect(mockDB.prepare).toHaveBeenCalledWith(
-                'INSERT INTO users (chat_id, username, first_name) VALUES (?, ?, ?) ON CONFLICT(chat_id) DO UPDATE SET username=excluded.username, first_name=excluded.first_name'
+                'INSERT INTO users (chat_id, username, first_name, timezone, city, country) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(chat_id) DO UPDATE SET username=excluded.username, first_name=excluded.first_name'
             );
-            expect(mockDB.bind).toHaveBeenCalledWith('123', 'testuser', 'Test');
+            expect(mockDB.bind).toHaveBeenCalledWith('123', 'testuser', 'Test', 'UTC', 'Unknown', 'Unknown');
             expect(mockDB.run).toHaveBeenCalled();
         });
 

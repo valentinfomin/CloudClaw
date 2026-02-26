@@ -2,9 +2,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { handleUpdate } from '../../src/handlers/commands.js';
 import * as importService from '../../src/services/import_service.js';
 import * as notificationService from '../../src/services/notification_service.js';
+import * as UserDAL from '../../src/db/users.js';
 
 vi.mock('../../src/services/import_service.js');
 vi.mock('../../src/services/notification_service.js');
+vi.mock('../../src/db/users.js');
 
 describe('Import Integration', () => {
     it('should process an import command and call the import service', async () => {
@@ -23,10 +25,13 @@ describe('Import Integration', () => {
                     prepare: vi.fn().mockReturnThis(),
                     bind: vi.fn().mockReturnThis(),
                     run: vi.fn().mockResolvedValue({ meta: { last_row_id: 1 } }),
+                    first: vi.fn()
                 }
             },
             json: vi.fn()
         };
+
+        UserDAL.getUser.mockResolvedValue({ chat_id: '123' });
 
         await handleUpdate(c, update);
 
