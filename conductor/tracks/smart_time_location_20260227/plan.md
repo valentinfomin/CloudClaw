@@ -29,8 +29,8 @@
     - [x] Sub-task: Update relevant unit tests in `test/text_utils.test.js`.
 - [x] Task: Update AI System Prompt for Smart Injection a295800
     - [x] Sub-task: Modify `systemPrompt` in `src/handlers/commands.js` to dynamically include `CURRENT TIME AND LOCATION` only when search is performed.
-- [ ] Task: Update Tavily Search with Time Context
-    - [ ] Sub-task: Update `performTavilySearch` in `src/services/search.js` to accept `effectiveTimezone` and pass it to Tavily if a search is performed.
+- [x] Task: Update Tavily Search with Time Context a295800
+    - [x] Sub-task: Update `performTavilySearch` in `src/services/search.js` to accept `effectiveTimezone` and pass it to Tavily if a search is performed.
 - [ ] Task: Integration Test for Smart Injection
     - [ ] Sub-task: Create a new test `test/time_context_smart_injection.test.js` to verify that time context is injected only when `SEARCH_NEEDED: YES` is inferred.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Context Injection and Formatting' (Protocol in workflow.md)
