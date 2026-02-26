@@ -13,6 +13,8 @@ CloudClaw is a highly responsive AI agent deployed on Cloudflare Workers, adheri
 - **Semantic Search & RAG:** Implement Retrieval-Augmented Generation for context-aware responses.
 - **Persistent Context:** Utilize Cloudflare D1 to store and retrieve conversation history.
 - **File Handling:** Securely store and manage user-uploaded files in Cloudflare R2.
+- **Data Import:** Enable real-time data synchronization with automatic field mapping and error handling.
+- **Web Search:** Integrated Tavily Search for real-time information retrieval and summarization.
 - **AI Processing:** Use Cloudflare Workers AI (`@cf/meta/llama-3-8b-instruct`) for reasoning and generation.
 
 ## Infrastructure & Architecture

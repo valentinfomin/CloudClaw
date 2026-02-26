@@ -10,6 +10,7 @@
 ## AI & Machine Learning
 - **Inference Engine:** Cloudflare Workers AI.
 - **Model:** `@cf/meta/llama-3-8b-instruct`.
+- **Search API:** Tavily AI.
 
 ## Development Tools
 - **CLI:** Wrangler (Cloudflare Workers CLI).
