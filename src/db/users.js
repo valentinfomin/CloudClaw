@@ -1,7 +1,7 @@
 export async function createUser(db, user) {
     const { chat_id, username, first_name } = user;
-    const query = 'INSERT INTO users (chat_id, username, first_name) VALUES (?, ?, ?) ON CONFLICT(chat_id) DO UPDATE SET username=excluded.username, first_name=excluded.first_name';
-    return await db.prepare(query).bind(chat_id, username, first_name).run();
+    const query = 'INSERT INTO users (chat_id, username, first_name, timezone, city, country) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(chat_id) DO UPDATE SET username=excluded.username, first_name=excluded.first_name';
+    return await db.prepare(query).bind(chat_id, username, first_name, 'UTC', 'Unknown', 'Unknown').run();
 }
 
 export async function getUser(db, chat_id) {
