@@ -2,9 +2,9 @@
 
 ## Phase 1: Context Extraction and Utility
 
-- [ ] Task: Implement Timezone Extraction.
-    - [ ] Sub-task: Update `src/index.js` to extract `request.cf.timezone` (and potentially `city`, `country`) from the incoming request.
-    - [ ] Sub-task: Pass this geolocation context into `handleUpdate`.
+- [x] Task: Implement Timezone Extraction. c46ac72
+    - [x] Sub-task: Update `src/index.js` to extract `request.cf.timezone` (and potentially `city`, `country`) from the incoming request.
+    - [x] Sub-task: Pass this geolocation context into `handleUpdate`.
 - [ ] Task: Create Time Utility.
     - [ ] Sub-task: Implement `getFormattedTimestamp(timezone)` in `src/utils/text.js`.
     - [ ] Sub-task: Add unit tests in `test/text_utils.test.js` to verify ISO 8601 formatting for various offsets.
