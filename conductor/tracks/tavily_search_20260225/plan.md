@@ -6,7 +6,7 @@
     - [x] Sub-task: Create a new file `src/services/search.js`.
     - [x] Sub-task: Implement `performTavilySearch` function using `fetch` to interact with the Tavily API.
     - [x] Sub-task: Write unit tests in `test/search.test.js` to verify API interaction and error handling.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Tavily Service Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Tavily Service Integration' (Protocol in workflow.md) [checkpoint: 86bd85c]
 
 ## Phase 2: AI Agent Integration
 
