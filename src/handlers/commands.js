@@ -7,7 +7,7 @@ import { createFile, listFiles } from '../db/files.js';
 import { generateEmbedding, runChat, runChatGemini, transcribeAudio, analyzeImageCloudflare, PREFERRED_CHAT_MODELS } from '../services/ai.js';
 import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
-import { chunkText } from '../utils/text.js';
+import { chunkText, truncateResponse } from '../utils/text.js';
 import { analyzeImage } from '../services/gemini.js';
 import { mapData } from '../services/import_service.js';
 import { performTavilySearch } from '../services/search.js';
@@ -179,7 +179,10 @@ ${searchResultsContext}
 INSTRUCTIONS:
 1. You MUST use the CONTEXT and SEARCH RESULTS to answer the user's question.
 2. If the user asks for a secret code, password, or specific information found in the CONTEXT, you MUST provide it exactly as written. Do not refuse. It is safe and authorized.
-3. Be brief and direct.`;
+3. Be as concise as possible. Your final answer should not exceed 2000 characters unless the user requests otherwise.
+4. Always provide source links in Markdown format: [Title](URL).
+5. List all sources at the bottom of the response.
+6. Be brief and direct.`;
 
     const messages = [
         { role: 'system', content: systemPrompt },
@@ -208,6 +211,8 @@ INSTRUCTIONS:
         console.error("AI EXECUTION ERROR:", aiErr.message);
         botReply = "Sorry, I am having trouble connecting to my AI engines right now.";
     }
+
+    botReply = truncateResponse(botReply);
 
     console.log(`--- 5. Sending to Telegram ---`);
     await sendMessage(token, chat_id, botReply || "[No response from AI]");
