@@ -12,13 +12,13 @@
 
 ## Phase 2: AI Prompt Integration
 
-- [ ] Task: Update Global System Prompt.
-    - [ ] Sub-task: Modify `systemPrompt` in `src/handlers/commands.js` to include a section for `CURRENT TIME AND LOCATION`.
-    - [ ] Sub-task: Update the AI instructions to use this information for situational awareness.
-- [ ] Task: Update Tavily Search Integration.
-    - [ ] Sub-task: Update `performTavilySearch` in `src/services/search.js` to accept and utilize the current timestamp if relevant.
-    - [ ] Sub-task: Update `processText` in `src/handlers/commands.js` to pass the timestamp to the search service.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: AI Prompt Integration' (Protocol in workflow.md)
+- [x] Task: Update Global System Prompt.
+    - [x] Sub-task: Modify `systemPrompt` in `src/handlers/commands.js` to include a section for `CURRENT TIME AND LOCATION`.
+    - [x] Sub-task: Update the AI instructions to use this information for situational awareness.
+- [x] Task: Update Tavily Search Integration.
+    - [x] Sub-task: Update `performTavilySearch` in `src/services/search.js` to accept and utilize the current timestamp if relevant.
+    - [x] Sub-task: Update `processText` in `src/handlers/commands.js` to pass the timestamp to the search service.
+- [x] Task: Conductor - User Manual Verification 'Phase 2: AI Prompt Integration' (Protocol in workflow.md) [checkpoint: 56f7418]
 
 ## Phase 3: Verification & Deployment
 
