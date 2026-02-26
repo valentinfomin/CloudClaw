@@ -13,12 +13,12 @@
 
 ## Phase 2: Verification & Testing
 
-- [ ] Task: Write Unit Tests for Truncation.
-    - [ ] Sub-task: Add test cases to `test/text_utils.test.js` verifying proper truncation and notice attachment.
-- [ ] Task: Integration Verification.
+- [x] Task: Write Unit Tests for Truncation.
+    - [x] Sub-task: Add test cases to `test/text_utils.test.js` verifying proper truncation and notice attachment.
+- [~] Task: Integration Verification.
     - [ ] Sub-task: Update `test/search_inference.test.js` or create a new test to verify the AI includes source links at the bottom (mocking AI response).
     - [ ] Sub-task: Run full test suite: `npm test`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Verification & Testing' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Verification & Testing' (Protocol in workflow.md) [checkpoint: e463859]
 
 ## Phase 3: Deployment
 
