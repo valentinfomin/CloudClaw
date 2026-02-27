@@ -26,7 +26,7 @@ export async function querySearch(aiSearch, query, options = {}) {
  * @returns {Promise<any>}
  */
 export async function indexPdf(aiSearch) {
-    // Placeholder for manual indexing trigger if available in the API
-    console.log("Indexing trigger called (placeholder)");
-    return { success: true };
+    // Managed AI Search automatically indexes from R2. 
+    // This function returns success to maintain the pipeline interface.
+    return { success: true, message: "Auto-indexing active" };
 }
