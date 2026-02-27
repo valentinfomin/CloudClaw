@@ -21,3 +21,7 @@ bucket_name = "cloudclaw-ai-search"
 [[vectorize]]
 binding = "VECTOR_INDEX"
 index_name = "cloudclaw-index"
+
+[[ai_search]]
+binding = "AI_SEARCH"
+index_name = "mypdfindex"
