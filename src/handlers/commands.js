@@ -13,7 +13,7 @@ import {
     extractDocumentCloudflare,
     PREFERRED_CHAT_MODELS 
 } from '../services/ai.js';
-import { querySearch, indexPdf } from '../services/ai_search.js';
+import { querySearch, indexPdf, synthesizeAnswer } from '../services/ai_search.js';
 import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
 import { chunkText, truncateResponse, getFormattedTimestamp } from '../utils/text.js';
@@ -74,7 +74,11 @@ export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', c
         // Handle Text Pipeline
         if (!text) return c.json({ ok: true });
         
-        await processText(c, chat_id, text, token, effectiveGeolocation);
+        if (text.startsWith('/')) {
+            await handleCommand(c, chat_id, text, token);
+        } else {
+            await handleSearchQuery(c, chat_id, text, token);
+        }
 
     } catch (err) {
         console.error("ERROR IN HANDLER:", err);
@@ -546,6 +550,8 @@ async function handleCommand(c, chat_id, text, token) {
 async function handleSearchQuery(c, chat_id, text, token) {
     const env = c.env;
     try {
+        await logMessage(env.DB, { chat_id, role: 'user', content: text });
+        
         console.log(`--- Performing AI Search for: ${text} ---`);
         const searchResults = await querySearch(env.AI_SEARCH, text);
         
