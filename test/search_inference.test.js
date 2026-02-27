@@ -48,7 +48,9 @@ describe('Search Inference Integration', () => {
                     upsert: vi.fn().mockResolvedValue(),
                     query: vi.fn().mockResolvedValue({ matches: [] })
                 },
-                AI: {}
+                AI: {
+                    autorag: vi.fn().mockReturnValue({ search: vi.fn() })
+                }
             },
             json: vi.fn()
         };
@@ -92,7 +94,9 @@ describe('Search Inference Integration', () => {
                     upsert: vi.fn().mockResolvedValue(),
                     query: vi.fn().mockResolvedValue({ matches: [] })
                 },
-                AI: {}
+                AI: {
+                    autorag: vi.fn().mockReturnValue({ search: vi.fn() })
+                }
             },
             json: vi.fn()
         };

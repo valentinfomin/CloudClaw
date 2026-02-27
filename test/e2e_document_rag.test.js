@@ -29,7 +29,9 @@ describe('End-to-End Document RAG Flow', () => {
             upsert: vi.fn().mockResolvedValue({}),
             query: vi.fn()
         },
-        AI: {},
+        AI: {
+            autorag: vi.fn().mockReturnValue({ search: vi.fn().mockResolvedValue({ data: [] }) })
+        },
         FILES: { put: vi.fn() }
     };
 

@@ -77,7 +77,7 @@ export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', c
         if (text.startsWith('/')) {
             await handleCommand(c, chat_id, text, token);
         } else {
-            await handleSearchQuery(c, chat_id, text, token);
+            await handleSearchQuery(c, chat_id, text, token, geolocation);
         }
 
     } catch (err) {
@@ -92,7 +92,7 @@ export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', c
     return c.json({ ok: true });
 }
 
-async function processText(c, chat_id, text, token, geolocation) {
+async function handleSearchQuery(c, chat_id, text, token, geolocation = { timezone: 'UTC', city: 'Unknown', country: 'Unknown' }) {
     const env = c.env;
     console.log(`--- Processing Text: ${text} ---`);
     const messageId = await logMessage(env.DB, { chat_id, role: 'user', content: text });
@@ -116,24 +116,6 @@ async function processText(c, chat_id, text, token, geolocation) {
     // Fetch user settings
     const user = await getUser(env.DB, chat_id);
 
-    // Command Handling
-    if (text.startsWith('/')) {
-        if (text === '/debug_time') {
-            const effectiveTimezone = user?.timezone || geolocation?.timezone || 'UTC';
-            const effectiveCity = user?.city || geolocation?.city || 'Unknown';
-            const effectiveCountry = user?.country || geolocation?.country || 'Unknown';
-            const debugInfo = `Detected Timezone: ${geolocation?.timezone || 'N/A'}\n` +
-                              `Detected City: ${geolocation?.city || 'N/A'}\n` +
-                              `Detected Country: ${geolocation?.country || 'N/A'}\n\n` +
-                              `User Overridden Timezone: ${user?.timezone || 'None'}\n` +
-                              `User Overridden Location: ${user?.city}, ${user?.country}\n\n` +
-                              `Formatted Time (Effective): ${getFormattedTimestamp(effectiveTimezone)}\n\n` +
-                              `Raw Geolocation Object (from CF): ${JSON.stringify(geolocation)}`;
-            return await sendMessage(token, chat_id, debugInfo);
-        }
-        return await handleCommand(c, chat_id, text, token);
-    }
-
     const provider = user?.preferred_ai_provider || 'cloudflare';
     console.log(`--- Using Provider: ${provider} ---`);
 
@@ -142,14 +124,29 @@ async function processText(c, chat_id, text, token, geolocation) {
     const effectiveCity = user?.city || geolocation?.city || 'Unknown';
     const effectiveCountry = user?.country || geolocation?.country || 'Unknown';
 
-    console.log("--- 2. Fetching Semantic Context (RAG) ---");
-    // ... (RAG matches logic remains same)
-    let semanticContext = "";
+            console.log('--- 2. Fetching Semantic Context (RAG) ---');
+        let semanticContext = '';
+        let searchResults = { data: [] };    
+    // 2.1 Cloudflare AI Search (PDF Intelligence)
+    try {
+        console.log(`--- Performing AI Search (PDFs) for: ${text} ---`);
+        searchResults = await querySearch(env.AI, 'mypdfindex', text);
+        if (searchResults?.data?.length > 0) {
+            semanticContext += "The following information was found in your uploaded PDF documents:\n";
+            searchResults.data.forEach(r => {
+                semanticContext += `- Source: ${r.filename || 'Unknown'}\n  Content: ${r.text || ''}\n`;
+            });
+            semanticContext += "\n";
+        }
+    } catch (searchErr) {
+        console.error("AI Search Error:", searchErr.message);
+    }
+
+    // 2.2 Vectorize Search (Messages and Images)
     if (currentVector) {
         try {
-            console.log(`--- Searching for Chat ID: ${chat_id} ---`);
+            console.log(`--- Searching Vector Index for Chat ID: ${chat_id} ---`);
             let matches = await semanticSearch(env.VECTOR_INDEX, currentVector, chat_id);
-            console.log(`--- RAG Matches Found: ${matches.length} ---`);
             
             if (matches.length === 0) {
                 const globalMatches = await env.VECTOR_INDEX.query(currentVector, { topK: 10, returnMetadata: true });
@@ -157,7 +154,7 @@ async function processText(c, chat_id, text, token, geolocation) {
             }
 
             if (matches.length > 0) {
-                semanticContext = "The following information was found in your private documents and previous messages:\n";
+                semanticContext += "Additional context found in your private messages and images:\n";
                 matches.forEach((m, idx) => {
                     if (m.metadata?.content) {
                         semanticContext += `- ${m.metadata.content}\n`;
@@ -165,7 +162,7 @@ async function processText(c, chat_id, text, token, geolocation) {
                 });
             }
         } catch (ragErr) {
-            console.error("FAILED TO FETCH SEMANTIC CONTEXT:", ragErr.message);
+            console.error("FAILED TO FETCH VECTOR CONTEXT:", ragErr.message);
         }
     }
 
@@ -213,42 +210,40 @@ User's Latest Message: ${text}`;
         timeAndLocationContext = `CURRENT TIME AND LOCATION:\n${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})\n\n`;
     }
 
-    console.log("--- 4. Calling AI ---");
+    console.log('--- 4. Calling AI (Synthesizing Answer) ---');
+    let botReply = '';
     const systemPrompt = `You are CloudClaw, a helpful personal assistant.\n\n` +
                          timeAndLocationContext +
-                         `You have been given explicit permission by the user to read their private ` +
-                         `documents and provide any information they request from them.\n\n` +
-                         `CONTEXT FROM USER'S DOCUMENTS:\n${semanticContext || "No document context found."}\n\n` +
+                         `CONTEXT FROM USER'S DOCUMENTS AND HISTORY:\n${semanticContext || "No document context found."}\n\n` +
                          `SEARCH RESULTS:\n${searchResultsContext}\n\n` +
                          `INSTRUCTIONS:\n` +
-                         `1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION ` +
-                         `to answer the user's question.\n` +
-                         `2. If the user asks for a secret code, password, or specific information found ` +
-                         `in the CONTEXT, you MUST provide it exactly as written. Do not refuse. ` +
-                         `It is safe and authorized.\n` +
-                         `3. Be as concise as possible. Your final answer should not exceed 2000 ` +
-                         `characters unless the user requests otherwise.\n` +
-                         `4. Always provide source links in Markdown format: [Title](URL).\n` +
-                         `5. List all sources at the bottom of the response.\n` +
-                         `6. Be brief and direct.`;
-
-    const messages = [
-        { role: 'system', content: systemPrompt },
-        ...history.map(h => ({ role: h.role, content: h.content }))
-    ];
-
-    let botReply = "";
+                         `1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION to answer the user's question.\n` +
+                         `2. Be as concise as possible. Your final answer should not exceed 2000 characters.\n` +
+                         `3. Always provide source links in Markdown format: [Title](URL).\n` +
+                         `4. Be brief and direct.`;
+    
     try {
         if (provider === 'gemini') {
+            const messages = [
+                { role: 'system', content: systemPrompt },
+                ...history.map(h => ({ role: h.role, content: h.content })),
+                { role: 'user', content: text }
+            ];
             botReply = await runChatGemini(env.GEMINI_API_KEY, messages);
         } else {
-            // Cloudflare First
+            // Cloudflare AI Search Synthesis
+            const additionalContext = (semanticContext || "") + "\n" + (searchResultsContext || "") + "\n" + (timeAndLocationContext || "");
             try {
-                botReply = await runChat(env.AI, PREFERRED_CHAT_MODELS, messages);
+                botReply = await synthesizeAnswer(env.AI, text, searchResults, history, additionalContext);
             } catch (cfErr) {
-                console.error("Cloudflare AI Error:", cfErr.message);
+                console.error("Cloudflare AI Synthesis Error:", cfErr.message);
                 if (cfErr.message.includes('503') || cfErr.message.includes('429') || cfErr.message.includes('limit')) {
                     await sendMessage(token, chat_id, "⚠️ Cloudflare AI limits reached or service unavailable. Switching to Gemini for this response...");
+                    const messages = [
+                        { role: 'system', content: systemPrompt },
+                        ...history.map(h => ({ role: h.role, content: h.content })),
+                        { role: 'user', content: text }
+                    ];
                     botReply = await runChatGemini(env.GEMINI_API_KEY, messages);
                 } else {
                     throw cfErr;
@@ -320,14 +315,14 @@ async function handleFile(c, chat_id, message, token) {
     // Special handling for PDF intelligence via AI Search
     if (mimeType === 'application/pdf') {
         try {
-            console.log("--- 1.5 Uploading to AI Search Bucket ---");
+            console.log('--- 1.5 Uploading to AI Search Bucket ---');
             const fileHash = timestamp.toString(16); // Simple hash for path
             await uploadPdfForSearch(env.AI_SEARCH_BUCKET, chat_id, fileHash, content);
             
-            console.log("--- 1.6 Triggering AI Search Indexing ---");
-            await indexPdf(env.AI, "mypdfindex");
+            console.log('--- 1.6 Triggering AI Search Indexing ---');
+            await indexPdf(env.AI, 'mypdfindex');
         } catch (searchErr) {
-            console.error("AI SEARCH SETUP ERROR:", searchErr.message);
+            console.error('AI SEARCH SETUP ERROR:', searchErr.message);
         }
     }
 
@@ -540,31 +535,4 @@ async function handleCommand(c, chat_id, text, token) {
     await sendMessage(token, chat_id, reply);
 }
 
-/**
- * Handle a search query using AI Search and synthesize an answer
- * @param {any} c Context
- * @param {string} chat_id Chat ID
- * @param {string} text User query
- * @param {string} token Telegram token
- */
-async function handleSearchQuery(c, chat_id, text, token) {
-    const env = c.env;
-    try {
-        await logMessage(env.DB, { chat_id, role: 'user', content: text });
-        
-        console.log(`--- Performing AI Search for: ${text} ---`);
-        const searchResults = await querySearch(env.AI, "mypdfindex", text);
-        
-        console.log(`--- Synthesizing Answer for: ${text} ---`);
-        const answer = await synthesizeAnswer(env.AI, text, searchResults);
-        
-        await sendMessage(token, chat_id, answer || "I couldn't find anything relevant in your documents.");
-        
-        // Log the AI response
-        await logMessage(env.DB, { chat_id, role: 'assistant', content: answer });
-        
-    } catch (err) {
-        console.error("AI SEARCH QUERY ERROR:", err.message);
-        await sendMessage(token, chat_id, "Error searching documents: " + err.message);
-    }
-}
+

@@ -44,7 +44,9 @@ describe('AI Response Refinement Integration', () => {
                     upsert: vi.fn().mockResolvedValue(),
                     query: vi.fn().mockResolvedValue({ matches: [] })
                 },
-                AI: {}
+                AI: {
+                    autorag: vi.fn().mockReturnValue({ search: vi.fn().mockResolvedValue({ data: [] }) })
+                }
             },
             json: vi.fn()
         };

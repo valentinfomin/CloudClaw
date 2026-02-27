@@ -4,6 +4,7 @@ import * as AI from '../src/services/ai.js';
 import * as StorageService from '../src/services/storage.js';
 import * as AISearchService from '../src/services/ai_search.js';
 import * as TelegramService from '../src/services/telegram.js';
+import * as MessagesDAL from '../src/db/messages.js';
 
 vi.mock('../src/services/ai.js');
 vi.mock('../src/services/storage.js', async () => {
@@ -23,6 +24,10 @@ vi.mock('../src/db/files.js');
 describe('E2E Local PDF Intelligence', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        MessagesDAL.logMessage.mockResolvedValue(1);
+        MessagesDAL.getChatHistory.mockResolvedValue([]);
+        AI.runChat.mockResolvedValue("SEARCH_NEEDED: NO");
+        AI.generateEmbedding.mockResolvedValue([0.1]);
     });
 
     const mockEnv = {

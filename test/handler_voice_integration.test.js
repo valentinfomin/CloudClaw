@@ -24,7 +24,9 @@ describe('Voice Integration Handler', () => {
         VECTOR_INDEX: {
             upsert: vi.fn().mockResolvedValue({})
         },
-        AI: {}
+        AI: {
+            autorag: vi.fn().mockReturnValue({ search: vi.fn().mockResolvedValue({ data: [] }) })
+        }
     };
 
     it('should transcribe voice and reply with AI', async () => {

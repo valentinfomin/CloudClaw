@@ -15,7 +15,9 @@ describe('Message Indexing Integration', () => {
         VECTOR_INDEX: {
             upsert: vi.fn().mockResolvedValue({})
         },
-        AI: {}
+        AI: {
+            autorag: vi.fn().mockReturnValue({ search: vi.fn() })
+        }
     };
 
     it('should index user message after logging to D1', async () => {

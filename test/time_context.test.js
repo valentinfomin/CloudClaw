@@ -56,7 +56,9 @@ describe('Time Context Integration', () => {
                 TG_TOKEN: 'mock_token',
                 DB: {},
                 VECTOR_INDEX: { upsert: vi.fn(), query: vi.fn(() => ({ matches: [] })) },
-                AI: {},
+                AI: {
+                    autorag: vi.fn().mockReturnValue({ search: vi.fn() })
+                },
                 TAVILY_API_KEY: 'mock_tavily_key' // Ensure Tavily API key is present
             },
             json: vi.fn()

@@ -1,5 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { querySearch, indexPdf, synthesizeAnswer } from '../src/services/ai_search.js';
+import * as AiService from '../src/services/ai.js';
+
+vi.mock('../src/services/ai.js', () => ({
+    runChat: vi.fn().mockResolvedValue('Synthesized Answer'),
+    PREFERRED_CHAT_MODELS: ['mock-model']
+}));
 
 describe('AI Search Service', () => {
     it('querySearch should call .search() on the binding via autorag', async () => {
@@ -27,29 +33,31 @@ describe('AI Search Service', () => {
         expect(result.success).toBe(true);
     });
 
-    it('synthesizeAnswer should format results and call AI.run', async () => {
-        const mockAi = {
-            run: vi.fn().mockResolvedValue({ response: 'Synthesized Answer' })
-        };
+    it('synthesizeAnswer should format results and call runChat', async () => {
+        const mockAi = {};
         const searchResults = {
-            results: [
-                { content: 'fact 1', metadata: { filename: 'doc1.pdf' } },
-                { content: 'fact 2', metadata: { filename: 'doc2.pdf' } }
+            data: [
+                { text: 'fact 1', filename: 'doc1.pdf' },
+                { text: 'fact 2', filename: 'doc2.pdf' }
             ]
         };
         const query = 'What are the facts?';
         
         const result = await synthesizeAnswer(mockAi, query, searchResults);
         
-        expect(mockAi.run).toHaveBeenCalledWith(
-            expect.stringContaining('llama'),
-            expect.objectContaining({
-                messages: expect.arrayContaining([
-                    expect.objectContaining({
-                        content: expect.stringContaining('fact 1')
-                    })
-                ])
-            })
+        expect(AiService.runChat).toHaveBeenCalledWith(
+            mockAi,
+            expect.any(Array),
+            expect.arrayContaining([
+                expect.objectContaining({
+                    role: 'system',
+                    content: expect.stringContaining('fact 1')
+                }),
+                expect.objectContaining({
+                    role: 'user',
+                    content: expect.stringContaining(query)
+                })
+            ])
         );
         expect(result).toBe('Synthesized Answer');
     });

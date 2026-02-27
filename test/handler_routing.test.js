@@ -30,7 +30,9 @@ describe('AI Routing Integration', () => {
         TG_TOKEN: 'token',
         DB: { prepare: vi.fn().mockReturnThis(), bind: vi.fn().mockReturnThis(), run: vi.fn().mockResolvedValue({ meta: { last_row_id: 1 } }) },
         VECTOR_INDEX: { upsert: vi.fn().mockResolvedValue({}) },
-        AI: {},
+        AI: {
+            autorag: vi.fn().mockReturnValue({ search: vi.fn() })
+        },
         GEMINI_API_KEY: 'gemini_key'
     };
 

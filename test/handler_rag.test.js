@@ -17,7 +17,9 @@ describe('RAG Integration', () => {
         VECTOR_INDEX: {
             upsert: vi.fn().mockResolvedValue({})
         },
-        AI: {}
+        AI: {
+            autorag: vi.fn().mockReturnValue({ search: vi.fn().mockResolvedValue({ data: [] }) })
+        }
     };
 
     it('should include semantic context in AI prompt', async () => {
