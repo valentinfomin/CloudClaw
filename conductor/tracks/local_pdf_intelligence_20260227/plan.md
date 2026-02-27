@@ -8,11 +8,11 @@
 - [x] Task: Implement the `uploadPdfForSearch` function in `src/services/storage.js`. 7baded3
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Setup & Core Services' (Protocol in workflow.md)
 
-## Phase 2: Indexing with AI Search
+## Phase 2: Indexing with AI Search [checkpoint: 00682db]
 - [x] Task: Write failing tests in `test/ai_search.test.js` to verify that a new `indexPdf` function calls the AI Search API to index a document. bd088da
 - [x] Task: Implement the `indexPdf` function in `src/services/ai_search.js`. 548686c
 - [x] Task: Update the `handleFile` function in `src/handlers/commands.js` to call `uploadPdfForSearch` and `indexPdf` when a PDF is uploaded. 1f8fcef
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Indexing with AI Search' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Indexing with AI Search' (Protocol in workflow.md)
 
 ## Phase 3: RAG Implementation
 - [ ] Task: Write failing tests for a new `querySearch` function that retrieves context from the AI Search API based on a user query.
