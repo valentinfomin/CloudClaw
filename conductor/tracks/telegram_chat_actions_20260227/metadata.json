@@ -1,0 +1,8 @@
+{
+  "track_id": "telegram_chat_actions_20260227",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-27T15:52:00Z",
+  "updated_at": "2026-02-27T15:52:00Z",
+  "description": "UX Improvement: When integrating with Telegram, always call sendChatAction with the typing status before starting search and generation."
+}
