@@ -535,3 +535,30 @@ async function handleCommand(c, chat_id, text, token) {
     
     await sendMessage(token, chat_id, reply);
 }
+
+/**
+ * Handle a search query using AI Search and synthesize an answer
+ * @param {any} c Context
+ * @param {string} chat_id Chat ID
+ * @param {string} text User query
+ * @param {string} token Telegram token
+ */
+async function handleSearchQuery(c, chat_id, text, token) {
+    const env = c.env;
+    try {
+        console.log(`--- Performing AI Search for: ${text} ---`);
+        const searchResults = await querySearch(env.AI_SEARCH, text);
+        
+        console.log(`--- Synthesizing Answer for: ${text} ---`);
+        const answer = await synthesizeAnswer(env.AI, text, searchResults);
+        
+        await sendMessage(token, chat_id, answer || "I couldn't find anything relevant in your documents.");
+        
+        // Log the AI response
+        await logMessage(env.DB, { chat_id, role: 'assistant', content: answer });
+        
+    } catch (err) {
+        console.error("AI SEARCH QUERY ERROR:", err.message);
+        await sendMessage(token, chat_id, "Error searching documents: " + err.message);
+    }
+}
