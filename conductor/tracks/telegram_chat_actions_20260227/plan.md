@@ -1,10 +1,10 @@
 # Implementation Plan: Telegram Chat Actions (Typing Indicator)
 
 ## Phase 1: Core Service Implementation
-- [ ] Task: Create a new function `sendChatAction(token, chat_id, action)` in `src/services/telegram.js`.
-- [ ] Task: Implement the `sendChatAction` function using the Telegram `sendChatAction` HTTP API endpoint.
-- [ ] Task: Add error handling within `sendChatAction` to catch exceptions and fail silently (e.g., wrap the `fetch` call in a try/catch block and ignore errors).
-- [ ] Task: Write a unit test in `test/telegram_service.test.js` (or similar) to verify `sendChatAction` sends the correct payload and handles network errors gracefully without throwing.
+- [x] Task: Create a new function `sendChatAction(token, chat_id, action)` in `src/services/telegram.js`. 59c16a8
+- [x] Task: Implement the `sendChatAction` function using the Telegram `sendChatAction` HTTP API endpoint. 59c16a8
+- [x] Task: Add error handling within `sendChatAction` to catch exceptions and fail silently (e.g., wrap the `fetch` call in a try/catch block and ignore errors). 59c16a8
+- [x] Task: Write a unit test in `test/telegram_service.test.js` (or similar) to verify `sendChatAction` sends the correct payload and handles network errors gracefully without throwing. 59c16a8
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Core Service Implementation' (Protocol in workflow.md)
 
 ## Phase 2: Integration into Message Handlers
