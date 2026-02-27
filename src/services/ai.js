@@ -9,8 +9,8 @@ export const PREFERRED_EMBEDDING_MODELS = [
 ];
 
 export const PREFERRED_CHAT_MODELS = [
-    '@cf/meta/llama-3.1-8b-instruct',
-    '@cf/meta/llama-3-8b-instruct',
+    '@cf/meta/llama-3.1-8b-instruct-fp8',
+    '@cf/meta/llama-3.2-3b-instruct',
     '@cf/qwen/qwen1.5-14b-chat-awq'
 ];
 

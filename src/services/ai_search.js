@@ -31,7 +31,12 @@ export async function querySearch(ai, instanceName, query, options = {}) {
                 let text = r.text || '';
                 if (!text && r.content) {
                     if (Array.isArray(r.content)) {
-                        text = r.content.join('\n');
+                        text = r.content.map(item => {
+                            if (typeof item === 'object' && item !== null) {
+                                return item.text || item.body || item.content || JSON.stringify(item);
+                            }
+                            return String(item);
+                        }).join('\n');
                     } else if (typeof r.content === 'object') {
                         text = r.content.text || r.content.body || r.content.content || JSON.stringify(r.content);
                     } else {
