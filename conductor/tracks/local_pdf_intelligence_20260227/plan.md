@@ -22,7 +22,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3: RAG Implementation' (Protocol in workflow.md)
 
 ## Phase 4: Finalization & Integration
-- [ ] Task: Create a new command handler `handleSearchQuery` that uses the RAG pipeline (`querySearch` -> `synthesizeAnswer`).
+- [~] Task: Create a new command handler `handleSearchQuery` that uses the RAG pipeline (`querySearch` -> `synthesizeAnswer`).
 - [ ] Task: Update the main `handleUpdate` router to direct text messages that are not commands to `handleSearchQuery`.
 - [ ] Task: Write end-to-end tests to simulate a user uploading a PDF, asking a question, and receiving a correctly formatted Markdown response.
 - [ ] Task: Deploy the feature to production.

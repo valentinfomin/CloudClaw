@@ -32,12 +32,12 @@ describe('E2E Local PDF Intelligence', () => {
             bind: vi.fn().mockReturnThis(),
             run: vi.fn().mockResolvedValue({ meta: { last_row_id: 1 } }),
         },
-        AI_SEARCH: {
-            search: vi.fn()
-        },
         AI_SEARCH_BUCKET: { put: vi.fn() },
         AI: {
             run: vi.fn(),
+            autorag: vi.fn().mockReturnValue({
+                search: vi.fn()
+            }),
             toMarkdown: vi.fn().mockResolvedValue({ data: 'Mocked PDF Text' })
         },
         FILES: { put: vi.fn() },
@@ -84,7 +84,7 @@ describe('E2E Local PDF Intelligence', () => {
 
         await handleUpdate({ env: mockEnv, json: vi.fn() }, queryUpdate);
 
-        expect(AISearchService.querySearch).toHaveBeenCalledWith(mockEnv.AI_SEARCH, 'What is in the PDF?');
+        expect(AISearchService.querySearch).toHaveBeenCalledWith(mockEnv.AI, 'mypdfindex', 'What is in the PDF?');
         expect(AISearchService.synthesizeAnswer).toHaveBeenCalled();
         expect(TelegramService.sendMessage).toHaveBeenCalledWith(
             expect.any(String),

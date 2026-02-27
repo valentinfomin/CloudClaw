@@ -325,7 +325,7 @@ async function handleFile(c, chat_id, message, token) {
             await uploadPdfForSearch(env.AI_SEARCH_BUCKET, chat_id, fileHash, content);
             
             console.log("--- 1.6 Triggering AI Search Indexing ---");
-            await indexPdf(env.AI_SEARCH);
+            await indexPdf(env.AI, "mypdfindex");
         } catch (searchErr) {
             console.error("AI SEARCH SETUP ERROR:", searchErr.message);
         }
@@ -553,7 +553,7 @@ async function handleSearchQuery(c, chat_id, text, token) {
         await logMessage(env.DB, { chat_id, role: 'user', content: text });
         
         console.log(`--- Performing AI Search for: ${text} ---`);
-        const searchResults = await querySearch(env.AI_SEARCH, text);
+        const searchResults = await querySearch(env.AI, "mypdfindex", text);
         
         console.log(`--- Synthesizing Answer for: ${text} ---`);
         const answer = await synthesizeAnswer(env.AI, text, searchResults);

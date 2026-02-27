@@ -2,15 +2,20 @@ import { describe, it, expect, vi } from 'vitest';
 import { querySearch, indexPdf, synthesizeAnswer } from '../src/services/ai_search.js';
 
 describe('AI Search Service', () => {
-    it('querySearch should call .search() on the binding', async () => {
-        const mockBinding = {
+    it('querySearch should call .search() on the binding via autorag', async () => {
+        const mockAutorag = {
             search: vi.fn().mockResolvedValue({ data: [{ content: 'test content' }] })
+        };
+        const mockAi = {
+            autorag: vi.fn().mockReturnValue(mockAutorag)
         };
         const query = 'test query';
         
-        const result = await querySearch(mockBinding, query);
+        const result = await querySearch(mockAi, 'mypdfindex', query);
         
-        expect(mockBinding.search).toHaveBeenCalledWith(query, expect.objectContaining({
+        expect(mockAi.autorag).toHaveBeenCalledWith('mypdfindex');
+        expect(mockAutorag.search).toHaveBeenCalledWith(expect.objectContaining({
+            query,
             max_results: 5,
             query_rewriting: true
         }));
@@ -18,7 +23,7 @@ describe('AI Search Service', () => {
     });
 
     it('indexPdf should return success (auto-indexing mode)', async () => {
-        const result = await indexPdf({});
+        const result = await indexPdf({}, 'mypdfindex');
         expect(result.success).toBe(true);
     });
 
