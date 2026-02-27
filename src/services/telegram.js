@@ -27,3 +27,24 @@ export async function sendMessage(token, chatId, text) {
         body: JSON.stringify({ chat_id: chatId, text })
     });
 }
+
+/**
+ * Send a chat action (like 'typing') to indicate the bot is processing.
+ * Fails silently so it does not interrupt the main workflow.
+ * 
+ * @param {string} token Telegram bot token
+ * @param {string|number} chatId Telegram chat ID
+ * @param {string} action The action type (e.g., 'typing', 'upload_photo')
+ */
+export async function sendChatAction(token, chatId, action = 'typing') {
+    const url = `https://api.telegram.org/bot${token}/sendChatAction`;
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, action })
+        });
+    } catch (err) {
+        console.warn(`[Non-critical] Failed to send chat action '${action}':`, err.message);
+    }
+}
