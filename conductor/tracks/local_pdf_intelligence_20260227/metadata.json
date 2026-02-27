@@ -1,0 +1,11 @@
+{
+  "track_id": "local_pdf_intelligence_20260227",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-27T10:13:00Z",
+  "updated_at": "2026-02-27T10:13:00Z",
+  "description": "Feature: Local-Only PDF Intelligence via Cloudflare AI Search
+Implementation of a standalone document processing module.
+Integration of env.AI_SEARCH as a single source of knowledge for RAG. Use of a local prioritet model for context analysis and response generation.
+Strict format adherence: responses based only on document facts and Markdown links."
+}
