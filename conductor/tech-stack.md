@@ -5,6 +5,7 @@
 - **Platform:** Cloudflare Workers.
 - **Database:** Cloudflare D1 (SQLite compatible).
 - **Storage:** Cloudflare R2 (S3 compatible object storage).
+- **Document Intelligence:** Cloudflare AI Search (Managed AutoRAG) with R2 (binding: `AI_SEARCH_BUCKET`).
 - **Vector Database:** Cloudflare Vectorize.
 
 ## AI & Machine Learning

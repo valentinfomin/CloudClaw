@@ -11,6 +11,7 @@ CloudClaw is a highly responsive AI agent deployed on Cloudflare Workers, adheri
 
 ## Core Features
 - **Semantic Search & RAG:** Implement Retrieval-Augmented Generation for context-aware responses.
+- **Local PDF Intelligence:** Integrated Cloudflare AI Search (Managed AutoRAG) for deep document analysis and private knowledge retrieval.
 - **Persistent Context:** Utilize Cloudflare D1 to store and retrieve conversation history.
 - **File Handling:** Securely store and manage user-uploaded files in Cloudflare R2.
 - **Data Import:** Enable real-time data synchronization with automatic field mapping and error handling.
@@ -23,6 +24,7 @@ CloudClaw is a highly responsive AI agent deployed on Cloudflare Workers, adheri
 - **Compute:** Cloudflare Workers
 - **Database:** Cloudflare D1 (binding: `DB`) for structured data and memory.
 - **Storage:** Cloudflare R2 (binding: `FILES`) for unstructured data and documents.
+- **Document Intelligence:** Cloudflare AI Search (Managed AutoRAG) with R2 binding `AI_SEARCH_BUCKET`.
 - **Vector Search:** Cloudflare Vectorize (binding: `VECTOR_INDEX`) for semantic search.
 - **AI Model:** Cloudflare Workers AI (`@cf/meta/llama-3-8b-instruct`).
 - **Interface:** Telegram Bot API (via `TG_TOKEN`).
