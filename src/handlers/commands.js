@@ -2,7 +2,7 @@
 import { createUser, getUser, updateAIProvider, updateUserLocation } from '../db/users.js';
 import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
-import { uploadFile, getFile } from '../services/storage.js';
+import { uploadFile, getFile, uploadPdfForSearch } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
 import { 
     generateEmbedding, 
@@ -13,6 +13,7 @@ import {
     extractDocumentCloudflare,
     PREFERRED_CHAT_MODELS 
 } from '../services/ai.js';
+import { querySearch, indexPdf } from '../services/ai_search.js';
 import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
 import { chunkText, truncateResponse, getFormattedTimestamp } from '../utils/text.js';
@@ -311,6 +312,20 @@ async function handleFile(c, chat_id, message, token) {
         content_type: mimeType,
         size: fileSize
     });
+
+    // Special handling for PDF intelligence via AI Search
+    if (mimeType === 'application/pdf') {
+        try {
+            console.log("--- 1.5 Uploading to AI Search Bucket ---");
+            const fileHash = timestamp.toString(16); // Simple hash for path
+            await uploadPdfForSearch(env.AI_SEARCH_BUCKET, chat_id, fileHash, content);
+            
+            console.log("--- 1.6 Triggering AI Search Indexing ---");
+            await indexPdf(env.AI_SEARCH);
+        } catch (searchErr) {
+            console.error("AI SEARCH SETUP ERROR:", searchErr.message);
+        }
+    }
 
     if (isPhoto) {
         try {

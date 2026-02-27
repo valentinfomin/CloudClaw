@@ -12,6 +12,7 @@ vi.mock('../src/db/files.js');
 vi.mock('../src/db/users.js');
 vi.mock('../src/db/messages.js');
 vi.mock('../src/services/telegram.js');
+vi.mock('../src/services/ai_search.js');
 
 describe('Document Indexing Integration', () => {
     beforeEach(() => {
@@ -28,6 +29,8 @@ describe('Document Indexing Integration', () => {
         VECTOR_INDEX: {
             upsert: vi.fn().mockResolvedValue({})
         },
+        AI_SEARCH: {},
+        AI_SEARCH_BUCKET: { put: vi.fn() },
         AI: {},
         FILES: { put: vi.fn() }
     };
@@ -131,5 +134,34 @@ describe('Document Indexing Integration', () => {
 
         expect(Extractor.extractText).toHaveBeenCalledWith(mockBuffer, 'application/pdf', 'key');
         expect(AI.extractDocumentCloudflare).not.toHaveBeenCalled();
+    });
+
+    it('should trigger AI Search for PDF upload', async () => {
+        const update = {
+            message: {
+                chat: { id: 123 },
+                from: { id: 123, username: 'testuser' },
+                document: {
+                    file_id: 'doc_pdf_search',
+                    file_name: 'searchable.pdf',
+                    mime_type: 'application/pdf',
+                    file_size: 500
+                }
+            }
+        };
+
+        const mockBuffer = new ArrayBuffer(500);
+        const AISearch = await import('../src/services/ai_search.js');
+
+        const TelegramService = await import('../src/services/telegram.js');
+        TelegramService.getFileInfo.mockResolvedValue({ file_path: 'docs/searchable.pdf' });
+        TelegramService.downloadFile.mockResolvedValue(mockBuffer);
+
+        const c = { env: { ...mockEnv, GEMINI_API_KEY: 'key' }, json: vi.fn() };
+
+        await handleUpdate(c, update);
+
+        expect(StorageService.uploadPdfForSearch).toHaveBeenCalled();
+        expect(AISearch.indexPdf).toHaveBeenCalled();
     });
 });
