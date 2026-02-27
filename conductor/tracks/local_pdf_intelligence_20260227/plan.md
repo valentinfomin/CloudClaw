@@ -1,12 +1,12 @@
 # Implementation Plan: Local-Only PDF Intelligence
 
-## Phase 1: Setup & Core Services
+## Phase 1: Setup & Core Services [checkpoint: 45715d1]
 - [x] Task: Configure a new R2 bucket binding named `AI_SEARCH_BUCKET` in `wrangler.toml` for storing PDFs. 6234463
 - [x] Task: Configure the `ai` binding in `wrangler.toml` to enable the `AI_SEARCH` feature. fd8ed6b
 - [x] Task: Create a new service module `src/services/ai_search.js` to encapsulate all logic related to AI Search. bd088da
 - [x] Task: Write failing tests for a new `uploadPdfForSearch` function that saves a file to the correct user-prefixed path in the `AI_SEARCH_BUCKET`. bd088da
 - [x] Task: Implement the `uploadPdfForSearch` function in `src/services/storage.js`. 7baded3
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Setup & Core Services' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Setup & Core Services' (Protocol in workflow.md)
 
 ## Phase 2: Indexing with AI Search
 - [ ] Task: Write failing tests in `test/ai_search.test.js` to verify that a new `indexPdf` function calls the AI Search API to index a document.
