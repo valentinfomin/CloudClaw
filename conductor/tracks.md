@@ -35,11 +35,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Use Tavily for search. The AI should automatically infer when to search, use Cloudflare Secrets for the API key, and provide an AI-generated summary of the results.**
 *Link: [./tracks/tavily_search_20260225/](./tracks/tavily_search_20260225/)*
 
----
 
-- [x] **Track: Feature: Local-Only PDF Intelligence via Cloudflare AI Search
-Implementation of a standalone document processing module.
-Integration of env.AI_SEARCH as a single source of knowledge for RAG. Use of a local prioritet model for context analysis and response generation.
-Strict format adherence: responses based only on document facts and Markdown links.**
-*Link: [./tracks/local_pdf_intelligence_20260227/](./tracks/local_pdf_intelligence_20260227/)*
 
