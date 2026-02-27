@@ -14,6 +14,10 @@ database_id = "bb14d4b1-f78b-4d0e-96fc-aadbef07253e"
 binding = "FILES"
 bucket_name = "cloudclaw-storage"
 
+[[r2_buckets]]
+binding = "AI_SEARCH_BUCKET"
+bucket_name = "cloudclaw-ai-search"
+
 [[vectorize]]
 binding = "VECTOR_INDEX"
 index_name = "cloudclaw-index"
