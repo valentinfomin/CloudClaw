@@ -14,12 +14,12 @@
 - [x] Task: Update the `handleFile` function in `src/handlers/commands.js` to call `uploadPdfForSearch` and `indexPdf` when a PDF is uploaded. 1f8fcef
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Indexing with AI Search' (Protocol in workflow.md)
 
-## Phase 3: RAG Implementation
+## Phase 3: RAG Implementation [checkpoint: 10b6391]
 - [x] Task: Write failing tests for a new `querySearch` function that retrieves context from the AI Search API based on a user query. bd088da
 - [x] Task: Implement the `querySearch` function in `src/services/ai_search.js`. bd088da
 - [x] Task: Write failing tests for a `synthesizeAnswer` function that takes search results and a query to generate a Markdown-formatted answer using a local LLM. bd088da
 - [x] Task: Implement the `synthesizeAnswer` function in `src/services/ai_search.js`. 2f1f852
-- [~] Task: Conductor - User Manual Verification 'Phase 3: RAG Implementation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: RAG Implementation' (Protocol in workflow.md)
 
 ## Phase 4: Finalization & Integration
 - [ ] Task: Create a new command handler `handleSearchQuery` that uses the RAG pipeline (`querySearch` -> `synthesizeAnswer`).
