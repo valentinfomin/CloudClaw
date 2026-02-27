@@ -19,6 +19,12 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Image Analysis and OCR with Google Gemini**
   *Link: [./tracks/image_analysis_20260224/](./tracks/image_analysis_20260224/)*
 
+- [x] **Track: Implement Document Parsing and RAG**
+  *Link: [./tracks/document_rag_20260224/](./tracks/document_rag_20260224/)*
+
+- [x] **Track: Implement Voice-to-Text Transcription**
+  *Link: [./tracks/voice_transcription_20260224/](./tracks/voice_transcription_20260224/)*
+
 ---
 
 - [x] **Track: I need to add a data import system. This system should be able to handle ongoing, real-time data synchronization. The field mapping should be automatic, based on matching column names. If there are errors in the data, the system should skip those rows and continue the import. If a field name in the source does not match a field in our data model, the system should provide a notification. This feature is valuable but not critical.**
@@ -29,7 +35,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Use Tavily for search. The AI should automatically infer when to search, use Cloudflare Secrets for the API key, and provide an AI-generated summary of the results.**
 *Link: [./tracks/tavily_search_20260225/](./tracks/tavily_search_20260225/)*
 
----
-
-- [x] **Track: Implement a smart time and location context injection system for AI, allowing manual overrides and ensuring precise ISO 8601 formatting, while keeping debug visibility optional.**
-*Link: [./tracks/smart_time_location_20260227/](./tracks/smart_time_location_20260227/)*

@@ -15,7 +15,7 @@ async function getAvailableModel(apiKey) {
     if (cachedModelId) return cachedModelId;
 
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`;
         const response = await fetch(url);
         const data = await response.json();
         
@@ -44,24 +44,36 @@ async function getAvailableModel(apiKey) {
 }
 
 export async function analyzeImage(apiKey, imageBuffer, mimeType) {
+    return analyzeDocument(apiKey, imageBuffer, mimeType, "Describe this image concisely. Extract any text or numbers found.");
+}
+
+/**
+ * Extract text from a document (PDF or image) using Google Gemini
+ * @param {string} apiKey 
+ * @param {ArrayBuffer} buffer 
+ * @param {string} mimeType 
+ * @param {string} prompt
+ * @returns {Promise<string>}
+ */
+export async function analyzeDocument(apiKey, buffer, mimeType, prompt = "Extract all text from this document accurately.") {
     if (!apiKey) throw new Error('GEMINI_API_KEY is missing');
     
     const modelId = await getAvailableModel(apiKey);
     console.log(`--- Gemini request using model: ${modelId} ---`);
     
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/${modelId}:generateContent?key=${apiKey}`;
     
     // Robust Base64 conversion
-    const base64Image = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
+    const base64Data = btoa(String.fromCharCode(...new Uint8Array(buffer)));
 
     const payload = {
         contents: [{
             parts: [
-                { text: "Describe this image concisely. Extract any text or numbers found." },
+                { text: prompt },
                 {
                     inline_data: {
                         mime_type: mimeType,
-                        data: base64Image
+                        data: base64Data
                     }
                 }
             ]
@@ -86,5 +98,5 @@ export async function analyzeImage(apiKey, imageBuffer, mimeType) {
         return data.candidates[0].content.parts[0].text;
     }
 
-    throw new Error('Failed to extract description from Gemini response');
+    throw new Error('Failed to extract content from Gemini response');
 }

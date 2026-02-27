@@ -31,7 +31,7 @@ describe('AI Service (Gemini Text)', () => {
         const result = await runChatGemini('key', messages);
         
         expect(mockFetch).toHaveBeenCalledWith(
-            expect.stringContaining('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'),
+            expect.stringContaining('https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent'),
             expect.any(Object)
         );
         expect(result).toBe('Gemini reply');

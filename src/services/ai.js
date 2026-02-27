@@ -74,12 +74,36 @@ export async function analyzeImageCloudflare(ai, imageBuffer) {
     return response.description;
 }
 
+/**
+ * Extract text from a document using Cloudflare Workers AI toMarkdown utility
+ * @param {any} ai Cloudflare AI binding
+ * @param {ArrayBuffer} buffer Document content
+ * @param {string} mimeType Content type
+ * @returns {Promise<string>}
+ */
+export async function extractDocumentCloudflare(ai, buffer, mimeType) {
+    if (!ai.toMarkdown) {
+        throw new Error('Cloudflare AI toMarkdown utility is not available in this environment');
+    }
+
+    const result = await ai.toMarkdown({
+        name: `doc_${Date.now()}`,
+        blob: new Blob([buffer], { type: mimeType })
+    });
+
+    if (!result || !result.data) {
+        throw new Error('Cloudflare extraction returned no data');
+    }
+
+    return result.data;
+}
+
 let cachedGeminiModelId = null;
 
 async function getAvailableGeminiModel(apiKey) {
     if (cachedGeminiModelId) return cachedGeminiModelId;
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`;
         const response = await fetch(url);
         const data = await response.json();
         if (data && data.models) {
@@ -99,7 +123,7 @@ async function getAvailableGeminiModel(apiKey) {
 
 export async function runChatGemini(apiKey, messages) {
     const modelId = await getAvailableGeminiModel(apiKey);
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/${modelId}:generateContent?key=${apiKey}`;
     
     const geminiMessages = messages.map(m => ({
         role: m.role === 'assistant' ? 'model' : 'user',

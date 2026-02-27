@@ -30,7 +30,7 @@ describe('Gemini Service', () => {
         const result = await analyzeImage(apiKey, imageBuffer, mimeType);
         
         expect(mockFetch).toHaveBeenCalledWith(
-            expect.stringContaining('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'),
+            expect.stringContaining('https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent'),
             expect.any(Object)
         );
         expect(result).toBe('A description of the image.');

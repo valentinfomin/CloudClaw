@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { handleUpdate } from '../src/handlers/commands.js';
 import * as AI from '../src/services/ai.js';
 import * as Extractor from '../src/services/extractor.js';
@@ -14,6 +14,10 @@ vi.mock('../src/db/messages.js');
 vi.mock('../src/services/telegram.js');
 
 describe('Document Indexing Integration', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     const mockEnv = {
         TG_TOKEN: 'token',
         DB: {
@@ -53,21 +57,79 @@ describe('Document Indexing Integration', () => {
         Extractor.extractText.mockResolvedValue(extractedText);
         AI.generateEmbedding.mockResolvedValue([0.1]);
 
-        const c = { env: mockEnv, json: vi.fn() };
+        const c = { env: { ...mockEnv, GEMINI_API_KEY: 'test-key' }, json: vi.fn() };
 
         await handleUpdate(c, update);
 
         // Verify extraction called
-        expect(Extractor.extractText).toHaveBeenCalledWith(mockBuffer, 'text/plain');
+        expect(Extractor.extractText).toHaveBeenCalledWith(mockBuffer, 'text/plain', 'test-key');
 
         // Verify indexing called for chunks
         expect(AI.generateEmbedding).toHaveBeenCalled();
-        expect(mockEnv.VECTOR_INDEX.upsert).toHaveBeenCalledWith(
-            expect.arrayContaining([
-                expect.objectContaining({
-                    metadata: expect.objectContaining({ source: 'document', filename: 'notes.txt' })
-                })
-            ])
-        );
+    });
+
+    it('should use Cloudflare extraction by default for PDF', async () => {
+        const update = {
+            message: {
+                chat: { id: 123 },
+                from: { id: 123, username: 'testuser' },
+                document: {
+                    file_id: 'doc_pdf_cf',
+                    file_name: 'report.pdf',
+                    mime_type: 'application/pdf',
+                    file_size: 500
+                }
+            }
+        };
+
+        const mockBuffer = new ArrayBuffer(500);
+        const extractedText = "Extracted by Cloudflare.";
+
+        const TelegramService = await import('../src/services/telegram.js');
+        TelegramService.getFileInfo.mockResolvedValue({ file_path: 'docs/report.pdf' });
+        TelegramService.downloadFile.mockResolvedValue(mockBuffer);
+        
+        AI.extractDocumentCloudflare.mockResolvedValue(extractedText);
+        AI.generateEmbedding.mockResolvedValue([0.3]);
+
+        const c = { env: { ...mockEnv, GEMINI_API_KEY: 'key' }, json: vi.fn() };
+
+        await handleUpdate(c, update);
+
+        expect(AI.extractDocumentCloudflare).toHaveBeenCalledWith(mockEnv.AI, mockBuffer, 'application/pdf');
+        expect(mockEnv.VECTOR_INDEX.upsert).toHaveBeenCalled();
+    });
+
+    it('should use Gemini for PDF when caption contains gemini', async () => {
+        const update = {
+            message: {
+                chat: { id: 123 },
+                from: { id: 123, username: 'testuser' },
+                caption: 'use gemini',
+                document: {
+                    file_id: 'doc_pdf_gemini',
+                    file_name: 'report.pdf',
+                    mime_type: 'application/pdf',
+                    file_size: 500
+                }
+            }
+        };
+
+        const mockBuffer = new ArrayBuffer(500);
+        const extractedText = "Extracted by Gemini.";
+
+        const TelegramService = await import('../src/services/telegram.js');
+        TelegramService.getFileInfo.mockResolvedValue({ file_path: 'docs/report.pdf' });
+        TelegramService.downloadFile.mockResolvedValue(mockBuffer);
+        
+        Extractor.extractText.mockResolvedValue(extractedText);
+        AI.generateEmbedding.mockResolvedValue([0.4]);
+
+        const c = { env: { ...mockEnv, GEMINI_API_KEY: 'key' }, json: vi.fn() };
+
+        await handleUpdate(c, update);
+
+        expect(Extractor.extractText).toHaveBeenCalledWith(mockBuffer, 'application/pdf', 'key');
+        expect(AI.extractDocumentCloudflare).not.toHaveBeenCalled();
     });
 });

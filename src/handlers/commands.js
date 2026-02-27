@@ -4,7 +4,15 @@ import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
 import { uploadFile, getFile } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
-import { generateEmbedding, runChat, runChatGemini, transcribeAudio, analyzeImageCloudflare, PREFERRED_CHAT_MODELS } from '../services/ai.js';
+import { 
+    generateEmbedding, 
+    runChat, 
+    runChatGemini, 
+    transcribeAudio, 
+    analyzeImageCloudflare, 
+    extractDocumentCloudflare,
+    PREFERRED_CHAT_MODELS 
+} from '../services/ai.js';
 import { semanticSearch } from '../services/vector.js';
 import { extractText } from '../services/extractor.js';
 import { chunkText, truncateResponse, getFormattedTimestamp } from '../utils/text.js';
@@ -355,10 +363,42 @@ async function handleFile(c, chat_id, message, token) {
         }
     } else {
         try {
-            console.log("--- Extracting and Indexing Document ---");
-            const extractedText = await extractText(content, mimeType);
-            const chunks = chunkText(extractedText, 1000, 200);
+            const user = await getUser(env.DB, chat_id);
+            let provider = user?.preferred_ai_provider || 'cloudflare';
             
+            // Caption Override Logic
+            const caption = message.caption?.toLowerCase() || "";
+            let manualOverride = false;
+            if (caption.includes('gemini')) {
+                provider = 'gemini';
+                manualOverride = true;
+                console.log(`--- Manual Override Triggered: Gemini via caption ---`);
+            }
+
+            console.log(`--- Extracting and Indexing Document (Provider: ${provider}) ---`);
+            
+            let extractedText = "";
+            let engineUsed = "";
+
+            if (provider === 'gemini' || mimeType !== 'application/pdf') {
+                extractedText = await extractText(content, mimeType, env.GEMINI_API_KEY);
+                engineUsed = provider === 'gemini' ? (manualOverride ? "Google Gemini (Manual Override)" : "Google Gemini") : "Local Extractor";
+            } else {
+                // Cloudflare First (PDF only)
+                try {
+                    extractedText = await extractDocumentCloudflare(env.AI, content, mimeType);
+                    engineUsed = "Cloudflare Extract";
+                } catch (cfErr) {
+                    console.error("Cloudflare Extraction Error:", cfErr.message);
+                    await sendMessage(token, chat_id, "⚠️ Cloudflare extraction failed. Falling back to Gemini...");
+                    extractedText = await extractText(content, mimeType, env.GEMINI_API_KEY);
+                    engineUsed = "Google Gemini (Fallback)";
+                }
+            }
+
+            console.log(`--- ${engineUsed} Content Extracted ---`);
+            const chunks = chunkText(extractedText, 1000, 200);
+
             const vectorRecords = [];
             for (let i = 0; i < chunks.length; i++) {
                 const vector = await generateEmbedding(env.AI, chunks[i]);
