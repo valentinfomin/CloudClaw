@@ -7,12 +7,12 @@
 - [x] Task: Write tests for `src/db/tasks.js` in `test/db_tasks.test.js`. f300b4b
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Database Setup' (Protocol in workflow.md) 96ccd99
 
-## Phase 2: Cron Handler Core
-- [ ] Task: Update `wrangler.toml` to include the cron trigger `[triggers] crons = ["* * * * *"]`.
-- [ ] Task: Implement the `scheduled` event listener in `src/index.js` (or import a router).
-- [ ] Task: Create `src/handlers/cron.js` to process pending tasks. It must fetch tasks from the DB and use `ctx.waitUntil` for concurrent execution.
-- [ ] Task: Write tests for the cron fetching and status updating logic in `test/cron_handler.test.js`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Cron Handler Core' (Protocol in workflow.md)
+## Phase 2: Cron Handler Core [checkpoint: 6962412]
+- [x] Task: Update `wrangler.toml` to include the cron trigger `[triggers] crons = ["* * * * *"]`. 3a05942
+- [x] Task: Implement the `scheduled` event listener in `src/index.js` (or import a router). 3a05942
+- [x] Task: Create `src/handlers/cron.js` to process pending tasks. It must fetch tasks from the DB and use `ctx.waitUntil` for concurrent execution. 3a05942
+- [x] Task: Write tests for the cron fetching and status updating logic in `test/cron_handler.test.js`. 3a05942
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Cron Handler Core' (Protocol in workflow.md) 6962412
 
 ## Phase 3: Task Executors
 - [ ] Task: Implement the `reminder` executor in `src/handlers/cron.js`. Ensure it uses the Telegram service and does NOT call AI.
