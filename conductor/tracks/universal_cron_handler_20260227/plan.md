@@ -22,6 +22,6 @@
 - [x] Task: Write tests verifying the executors and the retry logic. eb2327a
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Task Executors' (Protocol in workflow.md) 9256fb3
 
-## Phase 4: Finalization
-- [ ] Task: Deploy the updated worker to Cloudflare.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Finalization' (Protocol in workflow.md)
+## Phase 4: Finalization [checkpoint: 9aa15cc]
+- [x] Task: Deploy the updated worker to Cloudflare. 135ac1b
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Finalization' (Protocol in workflow.md) 9aa15cc
