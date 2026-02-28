@@ -37,7 +37,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: UX Improvement: When integrating with Telegram, always call sendChatAction with the typing status before starting search and generation.**
+- [x] **Track: UX Improvement: When integrating with Telegram, always call sendChatAction with the typing status before starting search and generation.**
 *Link: [./tracks/telegram_chat_actions_20260227/](./tracks/telegram_chat_actions_20260227/)*
 
 
