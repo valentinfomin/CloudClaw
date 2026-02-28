@@ -7,6 +7,7 @@
 - **Storage:** Cloudflare R2 (S3 compatible object storage).
 - **Document Intelligence:** Cloudflare AI Search (Managed AutoRAG) with R2 (binding: `AI_SEARCH_BUCKET`).
 - **Vector Database:** Cloudflare Vectorize.
+- **Background Processing:** Cloudflare Workers Cron Triggers.
 
 ## AI & Machine Learning
 - **Inference Engine:** Cloudflare Workers AI.
