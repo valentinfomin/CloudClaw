@@ -7,13 +7,13 @@
 - [x] Task: Write a unit test in `test/telegram_service.test.js` (or similar) to verify `sendChatAction` sends the correct payload and handles network errors gracefully without throwing. 59c16a8
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Core Service Implementation' (Protocol in workflow.md) 2be4066
 
-## Phase 2: Integration into Message Handlers
+## Phase 2: Integration into Message Handlers [checkpoint: 7375423]
 - [x] Task: Import `sendChatAction` into `src/handlers/commands.js`. 9f05ff6
 - [x] Task: In the `handleSearchQuery` function (text queries), dispatch `sendChatAction(token, chat_id, 'typing')` immediately after receiving the message, before the RAG and AI synthesis steps. 9f05ff6
 - [x] Task: In the `handleFile` function (document and image uploads), dispatch the `typing` action early in the file processing/AI analysis flow. 9f05ff6
 - [x] Task: In the `handleVoice` function (voice messages), dispatch the `typing` action before beginning transcription and AI generation. 9f05ff6
 - [x] Task: Update relevant end-to-end or integration tests (e.g., `test/e2e_local_pdf.test.js`, `test/handler_voice_integration.test.js`) to mock `sendChatAction` and verify it is called early in the respective flows. 9f05ff6
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Integration into Message Handlers' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Integration into Message Handlers' (Protocol in workflow.md) 7375423
 
 ## Phase 3: Finalization
 - [ ] Task: Deploy the updated worker to the Cloudflare edge.
