@@ -15,11 +15,11 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Cron Handler Core' (Protocol in workflow.md) 6962412
 
 ## Phase 3: Task Executors
-- [ ] Task: Implement the `reminder` executor in `src/handlers/cron.js`. Ensure it uses the Telegram service and does NOT call AI.
-- [ ] Task: Implement the `ai_process` executor. It should parse the payload, invoke the AI service, and send the result to the user.
-- [ ] Task: Implement the `cleanup` executor (e.g., a dummy implementation that logs for now, or truncates very old messages).
-- [ ] Task: Add retry/failure logic to the executor loop (increment retry count, push scheduled_at, or mark failed).
-- [ ] Task: Write tests verifying the executors and the retry logic.
+- [x] Task: Implement the `reminder` executor in `src/handlers/cron.js`. Ensure it uses the Telegram service and does NOT call AI. eb2327a
+- [x] Task: Implement the `ai_process` executor. It should parse the payload, invoke the AI service, and send the result to the user. eb2327a
+- [x] Task: Implement the `cleanup` executor (e.g., a dummy implementation that logs for now, or truncates very old messages). eb2327a
+- [x] Task: Add retry/failure logic to the executor loop (increment retry count, push scheduled_at, or mark failed). eb2327a
+- [x] Task: Write tests verifying the executors and the retry logic. eb2327a
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Task Executors' (Protocol in workflow.md)
 
 ## Phase 4: Finalization
