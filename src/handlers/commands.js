@@ -1,7 +1,7 @@
 // src/handlers/commands.js
 import { createUser, getUser, updateAIProvider, updateUserLocation } from '../db/users.js';
 import { logMessage, getChatHistory } from '../db/messages.js';
-import { getFileInfo, downloadFile, sendMessage } from '../services/telegram.js';
+import { getFileInfo, downloadFile, sendMessage, sendChatAction } from '../services/telegram.js';
 import { uploadFile, getFile, uploadPdfForSearch } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
 import { 
@@ -64,6 +64,9 @@ export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', c
         let text = message.text;
         if (message.voice) {
             console.log("--- Handling Voice ---");
+            // Dispatch typing action early for voice
+            await sendChatAction(token, chat_id, 'typing');
+            
             const fileInfo = await getFileInfo(token, message.voice.file_id);
             const audioBuffer = await downloadFile(token, fileInfo.file_path);
             text = await transcribeAudio(env.AI, audioBuffer);
@@ -95,6 +98,10 @@ export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', c
 async function handleSearchQuery(c, chat_id, text, token, geolocation = { timezone: 'UTC', city: 'Unknown', country: 'Unknown' }) {
     const env = c.env;
     console.log(`--- Processing Text: ${text} ---`);
+    
+    // Dispatch typing action early
+    await sendChatAction(token, chat_id, 'typing');
+    
     const messageId = await logMessage(env.DB, { chat_id, role: 'user', content: text });
 
     let currentVector = null;
@@ -295,6 +302,9 @@ async function handleFile(c, chat_id, message, token) {
         fileSize = photo.file_size;
         isPhoto = true;
     }
+
+    // Dispatch typing action early for file uploads
+    await sendChatAction(token, chat_id, 'typing');
 
     const fileInfo = await getFileInfo(token, fileId);
     const content = await downloadFile(token, fileInfo.file_path);
