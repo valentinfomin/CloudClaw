@@ -35,10 +35,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Use Tavily for search. The AI should automatically infer when to search, use Cloudflare Secrets for the API key, and provide an AI-generated summary of the results.**
 *Link: [./tracks/tavily_search_20260225/](./tracks/tavily_search_20260225/)*
 
----
 
-- [x] **Track: UX Improvement: When integrating with Telegram, always call sendChatAction with the typing status before starting search and generation.**
-*Link: [./tracks/telegram_chat_actions_20260227/](./tracks/telegram_chat_actions_20260227/)*
 
 
 
