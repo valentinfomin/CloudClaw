@@ -1,10 +1,10 @@
 # Implementation Plan: Universal Cron Handler & Task Scheduler
 
 ## Phase 1: Database Setup
-- [ ] Task: Create a new D1 migration file (`migrations/XXXX_create_tasks_table.sql`) with the required schema (`id`, `user_id`, `task_type`, `payload`, `scheduled_at`, `status`, `cron_rule`, `retry_count`, `max_retries`).
-- [ ] Task: Apply the migration to local and production databases using Wrangler.
-- [ ] Task: Create `src/db/tasks.js` to handle DB operations (createTask, getPendingTasks, updateTaskStatus).
-- [ ] Task: Write tests for `src/db/tasks.js` in `test/db_tasks.test.js`.
+- [x] Task: Create a new D1 migration file (`migrations/XXXX_create_tasks_table.sql`) with the required schema (`id`, `user_id`, `task_type`, `payload`, `scheduled_at`, `status`, `cron_rule`, `retry_count`, `max_retries`). c433a17
+- [x] Task: Apply the migration to local and production databases using Wrangler.
+- [x] Task: Create `src/db/tasks.js` to handle DB operations (createTask, getPendingTasks, updateTaskStatus). f300b4b
+- [x] Task: Write tests for `src/db/tasks.js` in `test/db_tasks.test.js`. f300b4b
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Setup' (Protocol in workflow.md)
 
 ## Phase 2: Cron Handler Core
