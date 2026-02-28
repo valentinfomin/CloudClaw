@@ -15,6 +15,6 @@
 - [x] Task: Update relevant end-to-end or integration tests (e.g., `test/e2e_local_pdf.test.js`, `test/handler_voice_integration.test.js`) to mock `sendChatAction` and verify it is called early in the respective flows. 9f05ff6
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Integration into Message Handlers' (Protocol in workflow.md) 7375423
 
-## Phase 3: Finalization
-- [ ] Task: Deploy the updated worker to the Cloudflare edge.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Finalization' (Protocol in workflow.md)
+## Phase 3: Finalization [checkpoint: d442394]
+- [x] Task: Deploy the updated worker to the Cloudflare edge. 1ccfac7
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Finalization' (Protocol in workflow.md) d442394
