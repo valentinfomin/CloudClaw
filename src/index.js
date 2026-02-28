@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { authMiddleware } from './middleware/auth.js';
 import { handleUpdate } from './handlers/commands.js';
+import { handleCron } from './handlers/cron.js';
 
 console.log("Worker Script Loaded");
 
@@ -37,4 +38,9 @@ app.post('/webhook', async (c) => {
 // Simple health check endpoint
 app.get('/', (c) => c.text('CloudClaw Agent is Online!'));
 
-export default app;
+export default {
+    fetch: app.fetch,
+    async scheduled(event, env, ctx) {
+        ctx.waitUntil(handleCron(event, env, ctx));
+    }
+};
