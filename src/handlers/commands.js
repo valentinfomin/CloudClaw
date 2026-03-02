@@ -301,9 +301,9 @@ User's Latest Message: ${text}`;
                          `INSTRUCTIONS:\n` +
                          `1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION to answer the user's question.\n` +
                          `2. Be as concise as possible. Your final answer should not exceed 2000 characters.\n` +
-                         `3. Always provide source links in Markdown format: [Title](URL).\n` +
-                         `4. Be brief and direct.\n` +
-                         `5. If the user asks for the current time or date, use the provided CURRENT TIME AND LOCATION strictly.`;
+                         `3. Provide source links in Markdown format [Title](URL) ONLY if you used SEARCH RESULTS. Do not invent links.\n` +
+                         `4. Be brief and direct. Answer in a natural, conversational tone.\n` +
+                         `5. If the user asks for the current time or date, answer naturally based on the CURRENT TIME AND LOCATION (e.g., "Сейчас 10:32 в White Rock").`;
     
     try {
         if (provider === 'gemini') {
