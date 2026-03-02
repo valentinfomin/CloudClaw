@@ -256,13 +256,16 @@ async function handleSearchQuery(c, chat_id, text, token, geolocation = { timezo
 
     console.log("--- 3.5 Web Search Inference ---");
     let searchResultsContext = "No search results available yet.";
+    let targetTimezoneContext = "";
     
     try {
-        const inferencePrompt = `Determine if a real-time web search is needed to answer the user's latest message.
-Reply ONLY with "SEARCH_NEEDED: YES: <search query>" or "SEARCH_NEEDED: NO".
-- If the user asks about current events, news, or live data (weather, stock), say YES.
-- If the user asks for the current time/date in their OWN location (or doesn't specify one), say NO (you already have this context).
-- If the user asks for the current time in a DIFFERENT location (e.g., "time in Israel"), say NO. You can calculate this using the provided UTC time.
+        const inferencePrompt = `Analyze the user's latest message and reply with EXACTLY ONE of the following formats:
+1. If the user asks about current events, news, or live data (e.g., weather, stock prices):
+   Reply: "SEARCH_NEEDED: YES: <search query>"
+2. If the user asks for the current time in a SPECIFIC country or city (e.g., "time in Israel", "время в Москве"):
+   Reply: "TIME_LOCATION: <IANA Timezone>" (e.g., "TIME_LOCATION: Asia/Jerusalem", "TIME_LOCATION: Europe/Moscow")
+3. For EVERYTHING ELSE (including their own local time, generic chat, math, etc.):
+   Reply: "SEARCH_NEEDED: NO"
 
 User Location: ${effectiveCity}, ${effectiveCountry}
 
@@ -275,7 +278,19 @@ User's Latest Message: ${text}`;
         const inferenceResult = await runChat(env.AI, PREFERRED_CHAT_MODELS, [{ role: 'system', content: inferencePrompt }]);
         console.log(`Search Inference: ${inferenceResult}`);
 
-        if (inferenceResult.includes("SEARCH_NEEDED: YES")) {
+        if (inferenceResult.includes("TIME_LOCATION:")) {
+            const tzMatch = inferenceResult.match(/TIME_LOCATION:\s*([A-Za-z_]+\/[A-Za-z_]+)/i);
+            if (tzMatch && tzMatch[1]) {
+                const targetTz = tzMatch[1].trim();
+                try {
+                    const tzTime = getFormattedTimestamp(targetTz);
+                    targetTimezoneContext = `\n- Time in ${targetTz}: ${tzTime}`;
+                    console.log(`Resolved Target Timezone: ${targetTz} -> ${tzTime}`);
+                } catch (e) {
+                    console.warn(`Failed to format time for timezone: ${targetTz}`);
+                }
+            }
+        } else if (inferenceResult.includes("SEARCH_NEEDED: YES")) {
             const queryMatch = inferenceResult.match(/SEARCH_NEEDED: YES:?\s*(.*)/i);
             const searchQuery = queryMatch && queryMatch[1] ? queryMatch[1].trim() : text;
             console.log(`Performing Search for: ${searchQuery}`);
@@ -295,7 +310,7 @@ User's Latest Message: ${text}`;
         console.error("Search inference failed:", e);
     }
 
-    const timeAndLocationContext = `SYSTEM CLOCKS:\n- Current UTC Time: ${new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')}\n- User's Local Time: ${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})\n\n`;
+    const timeAndLocationContext = `SYSTEM CLOCKS:\n- Current UTC Time: ${new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')}\n- User's Local Time: ${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})${targetTimezoneContext}\n\n`;
 
     console.log('--- 4. Calling AI (Synthesizing Answer) ---');
     let botReply = '';
@@ -308,7 +323,7 @@ User's Latest Message: ${text}`;
                          `2. Be as concise as possible. Your final answer should not exceed 2000 characters.\n` +
                          `3. Provide source links in Markdown format [Title](URL) ONLY if you used SEARCH RESULTS. Do not invent links.\n` +
                          `4. Be brief and direct. Answer in a natural, conversational tone.\n` +
-                         `5. If the user asks for the time in a different timezone, mathematically calculate it based on the Current UTC Time. Do not rely on web search for exact local times as they may be cached.`;
+                         `5. If answering about time, strictly use the information provided in SYSTEM CLOCKS. Do not attempt timezone math yourself.`;
     
     try {
         if (provider === 'gemini') {
