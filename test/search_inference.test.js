@@ -23,6 +23,8 @@ describe('Search Inference Integration', () => {
         messagesDb.getChatHistory.mockResolvedValue([]);
         messagesDb.logMessage.mockResolvedValue(1);
         
+        // Mock parseTaskIntent response (no intent)
+        aiService.runChat.mockResolvedValueOnce('{"intent_detected": false}');
         // Mock the inference call to return "SEARCH_NEEDED: YES"
         aiService.runChat.mockResolvedValueOnce("SEARCH_NEEDED: YES: Search query");
         
@@ -60,7 +62,7 @@ describe('Search Inference Integration', () => {
         expect(searchService.performTavilySearch).toHaveBeenCalledWith('mock_tavily', expect.any(String), expect.any(String));
         
         // Verify that the final AI call included the search results in the system prompt
-        const lastAiCallArgs = aiService.runChat.mock.calls[1];
+        const lastAiCallArgs = aiService.runChat.mock.calls[2];
         const systemMessage = lastAiCallArgs[2].find(m => m.role === 'system');
         expect(systemMessage.content).toContain('Search result content');
     });
@@ -71,6 +73,8 @@ describe('Search Inference Integration', () => {
         messagesDb.getChatHistory.mockResolvedValue([]);
         messagesDb.logMessage.mockResolvedValue(1);
         
+        // Mock parseTaskIntent response (no intent)
+        aiService.runChat.mockResolvedValueOnce('{"intent_detected": false}');
         // Mock the inference call to return "SEARCH_NEEDED: NO"
         aiService.runChat.mockResolvedValueOnce("SEARCH_NEEDED: NO");
         

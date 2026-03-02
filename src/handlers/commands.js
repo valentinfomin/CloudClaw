@@ -260,6 +260,7 @@ async function handleSearchQuery(c, chat_id, text, token, geolocation = { timezo
         const inferencePrompt = `Determine if a real-time web search is needed to answer the user's latest message.
 Reply ONLY with "SEARCH_NEEDED: YES: <search query>" or "SEARCH_NEEDED: NO".
 Consider the context. If the answer requires current events, real-time data (like stock prices, weather), or specific recent facts not likely to be in standard training data, say YES.
+CRITICAL: If the user is just asking for the current time, date, or day of the week, say "SEARCH_NEEDED: NO". The system already knows the time.
 
 Chat History:
 ${history.map(h => `${h.role}: ${h.content}`).join('\n')}
