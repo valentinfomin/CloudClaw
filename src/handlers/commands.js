@@ -130,7 +130,9 @@ async function handleConfirmation(c, chat_id, text, token) {
                 user_id: pending.user_id,
                 task_type: pending.task_type,
                 payload: pending.payload,
-                scheduled_at: now + pending.start_offset_ms
+                scheduled_at: now + pending.start_offset_ms,
+                remaining_count: pending.total_count || 1,
+                interval_ms: pending.interval_ms || 0
             });
             await sendMessage(token, chat_id, "✅ Task scheduled!");
         } catch (err) {
