@@ -12,7 +12,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Robust Task Creation' (Protocol in workflow.md) 57d18de
 
 ## Phase 2: Deployment & Verification
-- [ ] Task: Write an integration test in `test/commands_remind.test.js` to ensure the command correctly triggers the database write.
+- [x] Task: Write an integration test in `test/commands_remind.test.js` to ensure the command correctly triggers the database write. 96b84ec
 - [ ] Task: Deploy the worker to production.
 - [ ] Task: Perform a manual test in Telegram and check the production D1 table to confirm persistence.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Deployment & Verification' (Protocol in workflow.md)
