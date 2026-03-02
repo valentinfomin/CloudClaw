@@ -1,5 +1,7 @@
 # CloudClaw
 
+> A free, private, and serverless AI assistant built on Cloudflare Workers, D1, R2, and Vectorize. An open-source alternative to paid AI solutions, designed for privacy and security.
+
 CloudClaw is a highly responsive AI agent deployed on Cloudflare Workers. It functions as a persistent and capable assistant, leveraging Cloudflare's edge infrastructure for memory, storage, and intelligence.
 
 ## 💡 Project Philosophy
