@@ -4,7 +4,7 @@ import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage, sendChatAction } from '../services/telegram.js';
 import { uploadFile, getFile, uploadPdfForSearch } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
-import { createTaskVerified } from '../db/tasks.js';
+import { createTaskVerified, getLatestPendingTask, deletePendingTask, savePendingTask } from '../db/tasks.js';
 import { 
     generateEmbedding, 
     runChat, 
@@ -16,6 +16,7 @@ import {
 } from '../services/ai.js';
 import { querySearch, indexPdf, synthesizeAnswer } from '../services/ai_search.js';
 import { semanticSearch } from '../services/vector.js';
+import { parseTaskIntent } from '../services/task_parser.js';
 import { extractText } from '../services/extractor.js';
 import { chunkText, truncateResponse, getFormattedTimestamp } from '../utils/text.js';
 import { analyzeImage } from '../services/gemini.js';
@@ -78,6 +79,10 @@ export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', c
         // Handle Text Pipeline
         if (!text) return c.json({ ok: true });
         
+        // Check for confirmation to a pending task
+        const wasConfirmation = await handleConfirmation(c, chat_id, text, token);
+        if (wasConfirmation) return c.json({ ok: true });
+
         if (text.startsWith('/')) {
             await handleCommand(c, chat_id, text, token);
         } else {
@@ -96,9 +101,79 @@ export async function handleUpdate(c, update, geolocation = { timezone: 'UTC', c
     return c.json({ ok: true });
 }
 
+/**
+ * Checks if the message is a confirmation (Yes/No) to a pending task.
+ */
+async function handleConfirmation(c, chat_id, text, token) {
+    const env = c.env;
+    const lowerText = text.toLowerCase().trim();
+    const confirmations = ['yes', 'no', 'да', 'нет'];
+    
+    if (!confirmations.includes(lowerText)) {
+        return false;
+    }
+
+    const pending = await getLatestPendingTask(env.DB, chat_id);
+    if (!pending) return false;
+
+    // Check if pending task is recent (within 5 minutes)
+    const pendingTime = new Date(pending.created_at).getTime();
+    const now = Date.now();
+    if (now - pendingTime > 5 * 60 * 1000) {
+        await deletePendingTask(env.DB, pending.id);
+        return false;
+    }
+
+    if (lowerText === 'yes' || lowerText === 'да') {
+        try {
+            await createTaskVerified(env.DB, {
+                user_id: pending.user_id,
+                task_type: pending.task_type,
+                payload: pending.payload,
+                scheduled_at: now + pending.start_offset_ms
+            });
+            await sendMessage(token, chat_id, "✅ Task scheduled!");
+        } catch (err) {
+            await sendMessage(token, chat_id, "DB error while scheduling: " + err.message);
+        }
+    } else {
+        await sendMessage(token, chat_id, "Оkay, I won't schedule that.");
+    }
+
+    await deletePendingTask(env.DB, pending.id);
+    return true;
+}
+
+
 async function handleSearchQuery(c, chat_id, text, token, geolocation = { timezone: 'UTC', city: 'Unknown', country: 'Unknown' }) {
     const env = c.env;
     console.log(`--- Processing Text: ${text} ---`);
+
+    // 0. Smart Task Detection
+    try {
+        const history = await getChatHistory(env.DB, chat_id, 5);
+        const taskIntent = await parseTaskIntent(env.AI, text, history);
+        if (taskIntent && taskIntent.intent_detected) {
+            const pendingId = crypto.randomUUID();
+            await savePendingTask(env.DB, {
+                id: pendingId,
+                user_id: chat_id,
+                task_type: taskIntent.task_type || 'reminder',
+                payload: JSON.stringify({ text: taskIntent.message, ...taskIntent }),
+                start_offset_ms: taskIntent.start_offset_ms || 0,
+                interval_ms: taskIntent.interval_ms || 0,
+                total_count: taskIntent.total_count || 1
+            });
+            
+            const proposal = `I found a task: "${taskIntent.message}"\n` +
+                             `${taskIntent.explanation || ''}\n\n` +
+                             `Should I schedule this? (Yes/No)`;
+            await sendMessage(token, chat_id, proposal);
+            return;
+        }
+    } catch (parseErr) {
+        console.error('Smart Task Detection Error:', parseErr.message);
+    }
     
     // Dispatch typing action early
     await sendChatAction(token, chat_id, 'typing');
