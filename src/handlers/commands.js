@@ -257,51 +257,45 @@ async function handleSearchQuery(c, chat_id, text, token, geolocation = { timezo
     console.log("--- 3.5 Web Search Inference ---");
     let searchResultsContext = "No search results available yet.";
     
-    // Quick heuristic to bypass search for obvious local time/date questions
-    // We do NOT bypass if they ask for time "in [location]" or "в [локации]"
-    const lowerText = text.toLowerCase();
-    const isTimeQuery = /time is it|what time|current time|который час|сколько времени|какое сегодня число|what day is it|what is the date/i.test(lowerText) && !/in |в |at |for /i.test(lowerText);
-    
-    if (isTimeQuery) {
-        console.log("Search Inference: Bypassed for time query.");
-    } else {
-        try {
-            const inferencePrompt = `Determine if a real-time web search is needed to answer the user's latest message.
+    try {
+        const inferencePrompt = `Determine if a real-time web search is needed to answer the user's latest message.
 Reply ONLY with "SEARCH_NEEDED: YES: <search query>" or "SEARCH_NEEDED: NO".
-Consider the context. If the answer requires current events, real-time data (like stock prices, weather), or specific recent facts not likely to be in standard training data, say YES.
-CRITICAL: If the user is asking for the current time, date, or day of the week in ANY language, you MUST reply "SEARCH_NEEDED: NO". The system already knows the time perfectly.
+- If the user asks about current events, news, or live data (weather, stock), say YES.
+- If the user asks for the current time/date in their OWN location (or doesn't specify one), say NO (you already have this context).
+- If the user asks for the current time in a DIFFERENT location (e.g., "time in Israel"), say NO. You can calculate this using the provided UTC time.
+
+User Location: ${effectiveCity}, ${effectiveCountry}
 
 Chat History:
 ${history.map(h => `${h.role}: ${h.content}`).join('\n')}
 
 User's Latest Message: ${text}`;
-            
-            // Fast inference call
-            const inferenceResult = await runChat(env.AI, PREFERRED_CHAT_MODELS, [{ role: 'system', content: inferencePrompt }]);
-            console.log(`Search Inference: ${inferenceResult}`);
+        
+        // Fast inference call
+        const inferenceResult = await runChat(env.AI, PREFERRED_CHAT_MODELS, [{ role: 'system', content: inferencePrompt }]);
+        console.log(`Search Inference: ${inferenceResult}`);
 
-            if (inferenceResult.includes("SEARCH_NEEDED: YES")) {
-                const queryMatch = inferenceResult.match(/SEARCH_NEEDED: YES:?\s*(.*)/i);
-                const searchQuery = queryMatch && queryMatch[1] ? queryMatch[1].trim() : text;
-                console.log(`Performing Search for: ${searchQuery}`);
-                
-                if (env.TAVILY_API_KEY) {
-                    const results = await performTavilySearch(env.TAVILY_API_KEY, searchQuery, getFormattedTimestamp(effectiveTimezone));
-                    if (results && results.length > 0) {
-                        searchResultsContext = results.map(r => `Source: ${r.url}\nContent: ${r.content}`).join('\n\n');
-                    } else {
-                        searchResultsContext = "Search was performed but returned no relevant results.";
-                    }
+        if (inferenceResult.includes("SEARCH_NEEDED: YES")) {
+            const queryMatch = inferenceResult.match(/SEARCH_NEEDED: YES:?\s*(.*)/i);
+            const searchQuery = queryMatch && queryMatch[1] ? queryMatch[1].trim() : text;
+            console.log(`Performing Search for: ${searchQuery}`);
+            
+            if (env.TAVILY_API_KEY) {
+                const results = await performTavilySearch(env.TAVILY_API_KEY, searchQuery, getFormattedTimestamp(effectiveTimezone));
+                if (results && results.length > 0) {
+                    searchResultsContext = results.map(r => `Source: ${r.url}\nContent: ${r.content}`).join('\n\n');
                 } else {
-                     console.log("Tavily API key not found in environment.");
+                    searchResultsContext = "Search was performed but returned no relevant results.";
                 }
+            } else {
+                 console.log("Tavily API key not found in environment.");
             }
-        } catch (e) {
-            console.error("Search inference failed:", e);
         }
+    } catch (e) {
+        console.error("Search inference failed:", e);
     }
 
-    const timeAndLocationContext = `CURRENT TIME AND LOCATION:\n${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})\n\n`;
+    const timeAndLocationContext = `SYSTEM CLOCKS:\n- Current UTC Time: ${new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')}\n- User's Local Time: ${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})\n\n`;
 
     console.log('--- 4. Calling AI (Synthesizing Answer) ---');
     let botReply = '';
@@ -310,11 +304,11 @@ User's Latest Message: ${text}`;
                          `CONTEXT FROM USER'S DOCUMENTS AND HISTORY:\n${semanticContext || "No document context found."}\n\n` +
                          `SEARCH RESULTS:\n${searchResultsContext}\n\n` +
                          `INSTRUCTIONS:\n` +
-                         `1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION to answer the user's question.\n` +
+                         `1. You MUST use the CONTEXT, SEARCH RESULTS, and SYSTEM CLOCKS to answer the user's question.\n` +
                          `2. Be as concise as possible. Your final answer should not exceed 2000 characters.\n` +
                          `3. Provide source links in Markdown format [Title](URL) ONLY if you used SEARCH RESULTS. Do not invent links.\n` +
                          `4. Be brief and direct. Answer in a natural, conversational tone.\n` +
-                         `5. If the user asks for the current time or date, answer naturally based on the CURRENT TIME AND LOCATION, and you MUST include the city name (e.g., "Сейчас [время] в [Город]").`;
+                         `5. If the user asks for the time in a different timezone, mathematically calculate it based on the Current UTC Time. Do not rely on web search for exact local times as they may be cached.`;
     
     try {
         if (provider === 'gemini') {
