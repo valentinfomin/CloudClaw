@@ -7,8 +7,8 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: AI Task Extraction Engine' (Protocol in workflow.md) 9d88c86
 
 ## Phase 2: Confirmation Flow & State Management
-- [ ] Task: Extend user settings or a temporary "pending_tasks" table/KV to store tasks awaiting confirmation.
-- [ ] Task: Implement a confirmation handler in `src/handlers/commands.js` to process "Yes/No" replies to task proposals.
+- [x] Task: Extend user settings or a temporary "pending_tasks" table/KV to store tasks awaiting confirmation. 9596838
+- [~] Task: Implement a confirmation handler in `src/handlers/commands.js` to process "Yes/No" replies to task proposals.
 - [ ] Task: Update the main `handleSearchQuery` to call `parseTaskIntent` early and trigger the confirmation flow if an intent is found.
 - [ ] Task: Write integration tests for the "Detection -> Confirmation -> D1 Write" flow.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Confirmation Flow & State Management' (Protocol in workflow.md)
