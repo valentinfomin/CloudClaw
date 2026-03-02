@@ -305,7 +305,8 @@ User's Latest Message: ${text}`;
                          `2. Be as concise as possible. Your final answer should not exceed 2000 characters.\n` +
                          `3. Provide source links in Markdown format [Title](URL) ONLY if you used SEARCH RESULTS. Do not invent links.\n` +
                          `4. Be brief and direct. Answer in a natural, conversational tone.\n` +
-                         `5. If the user asks for the time in a different location, you MUST calculate it step-by-step: First, state the Current UTC Time. Second, state the target location's UTC offset. Finally, calculate and state the resulting local time.`;
+                         `5. WARNING: The CONTEXT and Chat History contain past messages. DO NOT use old times from the history to answer "what time is it now". ALWAYS use the real-time SYSTEM CLOCKS provided above.\n` +
+                         `6. If the user asks for the time in a different location, you MUST calculate it step-by-step: First, state the Current UTC Time. Second, state the target location's UTC offset. Finally, calculate and state the resulting local time.`;
     
     try {
         if (provider === 'gemini') {
