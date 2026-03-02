@@ -14,12 +14,12 @@ This project is built on the philosophy of being:
 ## 🚀 Core Features
 
 - **Smart Reminders:** AI-driven task scheduling and complex repetition logic (e.g., 'every 2 minutes, 3 times') with explicit user confirmation.
-- **Document Intelligence:** Integrated Cloudflare AI for deep document analysis and private knowledge retrieval.
-- **Semantic Search & RAG:** Retrieval-Augmented Generation for context-aware responses using your own conversation history.
-- **Web Search:** Integrated Tavily Search for real-time information retrieval.
+- **Document Intelligence:** Queries and retrieves information from uploaded documents using Cloudflare's built-in RAG (Retrieval-Augmented Generation) capabilities.
+- **Semantic Search:** Remembers your conversations and uses vector search to provide contextually relevant answers.
+- **Intelligent Web Search:** The agent first uses a fast AI model to **infer** if a web search is necessary. If required, it then uses the **Tavily API** to fetch real-time information. This two-step process saves resources and provides more relevant answers.
 - **Voice Transcription:** Transcribes voice messages into text.
 - **Image Analysis & OCR:** Uses Cloudflare Vision for powerful image description and text extraction.
-- **Time & Location Context:** Automatically respects your local time for true situational awareness.
+- **Time & Location Context:** Automatically respects your local time for true situational awareness, with the ability to calculate time in different timezones.
 - **Persistent Memory:** Utilizes a serverless SQL database to store conversation history and user settings.
 - **File Handling:** Securely manages user-uploaded files (PDFs, Images, Voice).
 - **Dynamic Model Selection:** Automatically falls back to Google Gemini for high-detail image analysis if needed.
@@ -33,6 +33,7 @@ This project is built entirely on the Cloudflare ecosystem:
 - **Object Storage:** [Cloudflare R2](https://developers.cloudflare.com/r2/) for file storage.
 - **Vector Database:** [Cloudflare Vectorize](https://developers.cloudflare.com/vectorize/) for semantic search.
 - **AI Inference:** [Workers AI](https://developers.cloudflare.com/workers-ai/) for running private AI models.
+- **Document Search:** [Cloudflare AI Search](https://blog.cloudflare.com/workers-ai-search-managed-rag-as-a-service) (Managed AutoRAG) for document intelligence.
 - **Scheduled Tasks:** [Cron Triggers](https://developers.cloudflare.com/workers/platform/triggers/cron-triggers/) for background jobs and reminders.
 
 ## ⚙️ Automated Installation
