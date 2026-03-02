@@ -6,12 +6,12 @@
 - [x] Task: Write unit tests in `test/task_parser.test.js` covering various languages and complex repetition scenarios. 9d88c86
 - [x] Task: Conductor - User Manual Verification 'Phase 1: AI Task Extraction Engine' (Protocol in workflow.md) 9d88c86
 
-## Phase 2: Confirmation Flow & State Management
+## Phase 2: Confirmation Flow & State Management [checkpoint: c3bc225]
 - [x] Task: Extend user settings or a temporary "pending_tasks" table/KV to store tasks awaiting confirmation. 9596838
-- [~] Task: Implement a confirmation handler in `src/handlers/commands.js` to process "Yes/No" replies to task proposals.
-- [ ] Task: Update the main `handleSearchQuery` to call `parseTaskIntent` early and trigger the confirmation flow if an intent is found.
-- [ ] Task: Write integration tests for the "Detection -> Confirmation -> D1 Write" flow.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Confirmation Flow & State Management' (Protocol in workflow.md)
+- [x] Task: Implement a confirmation handler in `src/handlers/commands.js` to process "Yes/No" replies to task proposals. c3bc225
+- [x] Task: Update the main `handleSearchQuery` to call `parseTaskIntent` early and trigger the confirmation flow if an intent is found. c3bc225
+- [x] Task: Write integration tests for the "Detection -> Confirmation -> D1 Write" flow. c3bc225
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Confirmation Flow & State Management' (Protocol in workflow.md) c3bc225
 
 ## Phase 3: Recursive Task Execution
 - [ ] Task: Update the `tasks` table schema in D1 to include `remaining_count` and `interval_ms` (via migration).
