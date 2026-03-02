@@ -27,7 +27,7 @@ describe('Tasks Database Module', () => {
         const id = await createTask(mockDb, task);
         
         expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO tasks'));
-        expect(mockStmt.bind).toHaveBeenCalledWith('user123', 'reminder', '{"text": "hello"}', 1000, null);
+        expect(mockStmt.bind).toHaveBeenCalledWith('user123', 'reminder', '{"text": "hello"}', 1000, null, 1, 0);
         expect(id).toBe(1);
     });
 
@@ -42,9 +42,24 @@ describe('Tasks Database Module', () => {
         const result = await createTaskVerified(mockDb, task);
         
         expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO tasks'));
-        expect(mockStmt.bind).toHaveBeenCalledWith('user123', 'reminder', '{"text": "hello"}', 1000, null);
+        expect(mockStmt.bind).toHaveBeenCalledWith('user123', 'reminder', '{"text": "hello"}', 1000, null, 1, 0);
         expect(result.success).toBe(true);
         expect(result.meta.last_row_id).toBe(1);
+    });
+
+    it('createTask should support custom remaining_count and interval_ms', async () => {
+        const task = {
+            user_id: 'user123',
+            task_type: 'reminder',
+            payload: '{}',
+            scheduled_at: 1000,
+            remaining_count: 5,
+            interval_ms: 60000
+        };
+
+        await createTask(mockDb, task);
+        
+        expect(mockStmt.bind).toHaveBeenCalledWith('user123', 'reminder', '{}', 1000, null, 5, 60000);
     });
 
     it('createTaskVerified should propagate database errors', async () => {

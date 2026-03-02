@@ -11,15 +11,17 @@
  * @param {string} task.payload - JSON string payload
  * @param {number} task.scheduled_at - Timestamp in ms
  * @param {string} [task.cron_rule] - Optional cron rule for repeating tasks
+ * @param {number} [task.remaining_count] - Number of times to repeat
+ * @param {number} [task.interval_ms] - Interval between repetitions in ms
  * @returns {Promise<number>} - ID of the created task
  */
 export async function createTask(db, task) {
-    const { user_id, task_type, payload, scheduled_at, cron_rule = null } = task;
+    const { user_id, task_type, payload, scheduled_at, cron_rule = null, remaining_count = 1, interval_ms = 0 } = task;
     const stmt = db.prepare(
-        `INSERT INTO tasks (user_id, task_type, payload, scheduled_at, cron_rule) 
-         VALUES (?, ?, ?, ?, ?)`
+        `INSERT INTO tasks (user_id, task_type, payload, scheduled_at, cron_rule, remaining_count, interval_ms) 
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
     );
-    const result = await stmt.bind(user_id, task_type, payload, scheduled_at, cron_rule).run();
+    const result = await stmt.bind(user_id, task_type, payload, scheduled_at, cron_rule, remaining_count, interval_ms).run();
     return result.meta.last_row_id;
 }
 
