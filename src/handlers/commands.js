@@ -257,9 +257,10 @@ async function handleSearchQuery(c, chat_id, text, token, geolocation = { timezo
     console.log("--- 3.5 Web Search Inference ---");
     let searchResultsContext = "No search results available yet.";
     
-    // Quick heuristic to bypass search for obvious time/date questions
+    // Quick heuristic to bypass search for obvious local time/date questions
+    // We do NOT bypass if they ask for time "in [location]" or "в [локации]"
     const lowerText = text.toLowerCase();
-    const isTimeQuery = /time is it|what time|current time|который час|сколько времени|какое сегодня число|what day is it|what is the date/i.test(lowerText);
+    const isTimeQuery = /time is it|what time|current time|который час|сколько времени|какое сегодня число|what day is it|what is the date/i.test(lowerText) && !/in |в |at |for /i.test(lowerText);
     
     if (isTimeQuery) {
         console.log("Search Inference: Bypassed for time query.");
