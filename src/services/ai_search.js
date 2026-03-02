@@ -76,9 +76,10 @@ export async function indexPdf(ai, instanceName) {
  * @param {any} searchResults Results from AI_SEARCH.search()
  * @param {any[]} history Optional chat history
  * @param {string} additionalContext Extra context from other sources
+ * @param {string} [customSystemPrompt] Optional override for the system prompt
  * @returns {Promise<string>}
  */
-export async function synthesizeAnswer(ai, query, searchResults, history = [], additionalContext = '') {
+export async function synthesizeAnswer(ai, query, searchResults, history = [], additionalContext = '', customSystemPrompt = null) {
     const data = searchResults.data || [];
     console.log(`--- Context Mapping [Count: ${data.length}] ---`);
     if (data.length > 0) {
@@ -92,7 +93,7 @@ export async function synthesizeAnswer(ai, query, searchResults, history = [], a
     const fullContext = (docContext ? `DOCUMENTS:\n${docContext}\n\n` : '') + 
                        (additionalContext ? `OTHER CONTEXT:\n${additionalContext}\n\n` : '');
 
-    const systemPrompt = `You are a document intelligence assistant. 
+    const systemPrompt = customSystemPrompt || `You are a document intelligence assistant. 
 Answer the user's question based ONLY on the provided context.
 If the information is not in the context, say "I don't know based on the uploaded documents."
 Provide source references in Markdown format if available.

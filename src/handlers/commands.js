@@ -302,7 +302,8 @@ User's Latest Message: ${text}`;
                          `1. You MUST use the CONTEXT, SEARCH RESULTS, and CURRENT TIME AND LOCATION to answer the user's question.\n` +
                          `2. Be as concise as possible. Your final answer should not exceed 2000 characters.\n` +
                          `3. Always provide source links in Markdown format: [Title](URL).\n` +
-                         `4. Be brief and direct.`;
+                         `4. Be brief and direct.\n` +
+                         `5. If the user asks for the current time or date, use the provided CURRENT TIME AND LOCATION strictly.`;
     
     try {
         if (provider === 'gemini') {
@@ -316,7 +317,8 @@ User's Latest Message: ${text}`;
             // Cloudflare AI Search Synthesis
             const additionalContext = (semanticContext || "") + "\n" + (searchResultsContext || "") + "\n" + (timeAndLocationContext || "");
             try {
-                botReply = await synthesizeAnswer(env.AI, text, searchResults, history, additionalContext);
+                // Pass the unified systemPrompt to ensure time context is respected
+                botReply = await synthesizeAnswer(env.AI, text, searchResults, history, additionalContext, systemPrompt);
             } catch (cfErr) {
                 console.error("Cloudflare AI Synthesis Error:", cfErr.message);
                 if (cfErr.message.includes('503') || cfErr.message.includes('429') || cfErr.message.includes('limit')) {
