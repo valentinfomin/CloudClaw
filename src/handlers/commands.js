@@ -260,7 +260,7 @@ async function handleSearchQuery(c, chat_id, text, token, geolocation = { timezo
         const inferencePrompt = `Determine if a real-time web search is needed to answer the user's latest message.
 Reply ONLY with "SEARCH_NEEDED: YES: <search query>" or "SEARCH_NEEDED: NO".
 Consider the context. If the answer requires current events, real-time data (like stock prices, weather), or specific recent facts not likely to be in standard training data, say YES.
-CRITICAL: If the user is just asking for the current time, date, or day of the week, say "SEARCH_NEEDED: NO". The system already knows the time.
+CRITICAL: If the user is asking for the current time, date, or day of the week in ANY language (e.g., "what time is it", "который час", "какое сегодня число"), you MUST reply "SEARCH_NEEDED: NO". The system already knows the time perfectly.
 
 Chat History:
 ${history.map(h => `${h.role}: ${h.content}`).join('\n')}
@@ -304,7 +304,7 @@ User's Latest Message: ${text}`;
                          `2. Be as concise as possible. Your final answer should not exceed 2000 characters.\n` +
                          `3. Provide source links in Markdown format [Title](URL) ONLY if you used SEARCH RESULTS. Do not invent links.\n` +
                          `4. Be brief and direct. Answer in a natural, conversational tone.\n` +
-                         `5. If the user asks for the current time or date, answer naturally based on the CURRENT TIME AND LOCATION, and you MUST include the city name (e.g., "Сейчас 10:32 утра в White Rock").`;
+                         `5. If the user asks for the current time or date, answer naturally based on the CURRENT TIME AND LOCATION, and you MUST include the city name (e.g., "Сейчас [время] в [Город]").`;
     
     try {
         if (provider === 'gemini') {
