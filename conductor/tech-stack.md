@@ -8,6 +8,7 @@
 - **Document Intelligence:** Cloudflare AI Search (Managed AutoRAG) with R2 (binding: `AI_SEARCH_BUCKET`).
 - **Vector Database:** Cloudflare Vectorize.
 - **Background Processing:** Cloudflare Workers Cron Triggers.
+- **Intent Extraction:** AI-driven task parsing with @cf/meta/llama-3.2-3b-instruct.
 
 ## AI & Machine Learning
 - **Inference Engine:** Cloudflare Workers AI.

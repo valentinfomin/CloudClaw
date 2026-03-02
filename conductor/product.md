@@ -19,6 +19,7 @@ CloudClaw is a highly responsive AI agent deployed on Cloudflare Workers, adheri
 - **Time Context Aware:** Automatically detects user's local time and timezone (via Cloudflare Geolocation or manual override) for situational awareness.
 - **AI Processing:** Use Cloudflare Workers AI (`@cf/meta/llama-3-8b-instruct`) for reasoning and generation.
 - **Responsive UX:** Utilizes Telegram chat actions (e.g., 'typing') to provide immediate feedback during long-running operations.
+- **Smart Reminders:** AI-driven task scheduling and complex repetition logic (e.g., 'every 2 minutes, 3 times') with explicit user confirmation.
 - **Scheduled Tasks:** Universal Cron handler for background processing, reminders, and asynchronous AI workflows.
 - **Response Optimization:** Automatic soft-truncation and strict conciseness rules for all AI output.
 
