@@ -1,0 +1,25 @@
+# Implementation Plan: Smart Reminders & Complex Task Scheduling
+
+## Phase 1: AI Task Extraction Engine [checkpoint: 9d88c86]
+- [x] Task: Create `src/services/task_parser.js` with a function `parseTaskIntent(text, history)`. 9d88c86
+- [x] Task: Implement LLM prompt in `task_parser.js` that outputs structured JSON for: `intent_detected`, `message`, `start_offset_ms`, `interval_ms`, `total_count`. 9d88c86
+- [x] Task: Write unit tests in `test/task_parser.test.js` covering various languages and complex repetition scenarios. 9d88c86
+- [x] Task: Conductor - User Manual Verification 'Phase 1: AI Task Extraction Engine' (Protocol in workflow.md) 9d88c86
+
+## Phase 2: Confirmation Flow & State Management [checkpoint: c3bc225]
+- [x] Task: Extend user settings or a temporary "pending_tasks" table/KV to store tasks awaiting confirmation. 9596838
+- [x] Task: Implement a confirmation handler in `src/handlers/commands.js` to process "Yes/No" replies to task proposals. c3bc225
+- [x] Task: Update the main `handleSearchQuery` to call `parseTaskIntent` early and trigger the confirmation flow if an intent is found. c3bc225
+- [x] Task: Write integration tests for the "Detection -> Confirmation -> D1 Write" flow. c3bc225
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Confirmation Flow & State Management' (Protocol in workflow.md) c3bc225
+
+## Phase 3: Recursive Task Execution [checkpoint: e1e19ea]
+- [x] Task: Update the `tasks` table schema in D1 to include `remaining_count` and `interval_ms` (via migration). 80a66d8
+- [x] Task: Update `src/handlers/cron.js` to handle repetition logic: if `remaining_count > 1`, decrement and reschedule. 80a66d8
+- [x] Task: Write tests for the recursive scheduling logic in `test/cron_repetition.test.js`. 80a66d8
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Recursive Task Execution' (Protocol in workflow.md) e1e19ea
+
+## Phase 4: Finalization [checkpoint: 88c9b73]
+- [x] Task: Deploy the updated worker to production. a0b353d
+- [x] Task: Verify the full "Smart Reminder" cycle in production. 88c9b73
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Finalization' (Protocol in workflow.md) 88c9b73
