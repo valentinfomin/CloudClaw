@@ -256,39 +256,48 @@ async function handleSearchQuery(c, chat_id, text, token, geolocation = { timezo
 
     console.log("--- 3.5 Web Search Inference ---");
     let searchResultsContext = "No search results available yet.";
-    try {
-        const inferencePrompt = `Determine if a real-time web search is needed to answer the user's latest message.
+    
+    // Quick heuristic to bypass search for obvious time/date questions
+    const lowerText = text.toLowerCase();
+    const isTimeQuery = /time is it|what time|current time|который час|сколько времени|какое сегодня число|what day is it|what is the date/i.test(lowerText);
+    
+    if (isTimeQuery) {
+        console.log("Search Inference: Bypassed for time query.");
+    } else {
+        try {
+            const inferencePrompt = `Determine if a real-time web search is needed to answer the user's latest message.
 Reply ONLY with "SEARCH_NEEDED: YES: <search query>" or "SEARCH_NEEDED: NO".
 Consider the context. If the answer requires current events, real-time data (like stock prices, weather), or specific recent facts not likely to be in standard training data, say YES.
-CRITICAL: If the user is asking for the current time, date, or day of the week in ANY language (e.g., "what time is it", "который час", "какое сегодня число"), you MUST reply "SEARCH_NEEDED: NO". The system already knows the time perfectly.
+CRITICAL: If the user is asking for the current time, date, or day of the week in ANY language, you MUST reply "SEARCH_NEEDED: NO". The system already knows the time perfectly.
 
 Chat History:
 ${history.map(h => `${h.role}: ${h.content}`).join('\n')}
 
 User's Latest Message: ${text}`;
-        
-        // Fast inference call
-        const inferenceResult = await runChat(env.AI, PREFERRED_CHAT_MODELS, [{ role: 'system', content: inferencePrompt }]);
-        console.log(`Search Inference: ${inferenceResult}`);
-
-        if (inferenceResult.includes("SEARCH_NEEDED: YES")) {
-            const queryMatch = inferenceResult.match(/SEARCH_NEEDED: YES:?\s*(.*)/i);
-            const searchQuery = queryMatch && queryMatch[1] ? queryMatch[1].trim() : text;
-            console.log(`Performing Search for: ${searchQuery}`);
             
-            if (env.TAVILY_API_KEY) {
-                const results = await performTavilySearch(env.TAVILY_API_KEY, searchQuery, getFormattedTimestamp(effectiveTimezone));
-                if (results && results.length > 0) {
-                    searchResultsContext = results.map(r => `Source: ${r.url}\nContent: ${r.content}`).join('\n\n');
+            // Fast inference call
+            const inferenceResult = await runChat(env.AI, PREFERRED_CHAT_MODELS, [{ role: 'system', content: inferencePrompt }]);
+            console.log(`Search Inference: ${inferenceResult}`);
+
+            if (inferenceResult.includes("SEARCH_NEEDED: YES")) {
+                const queryMatch = inferenceResult.match(/SEARCH_NEEDED: YES:?\s*(.*)/i);
+                const searchQuery = queryMatch && queryMatch[1] ? queryMatch[1].trim() : text;
+                console.log(`Performing Search for: ${searchQuery}`);
+                
+                if (env.TAVILY_API_KEY) {
+                    const results = await performTavilySearch(env.TAVILY_API_KEY, searchQuery, getFormattedTimestamp(effectiveTimezone));
+                    if (results && results.length > 0) {
+                        searchResultsContext = results.map(r => `Source: ${r.url}\nContent: ${r.content}`).join('\n\n');
+                    } else {
+                        searchResultsContext = "Search was performed but returned no relevant results.";
+                    }
                 } else {
-                    searchResultsContext = "Search was performed but returned no relevant results.";
+                     console.log("Tavily API key not found in environment.");
                 }
-            } else {
-                 console.log("Tavily API key not found in environment.");
             }
+        } catch (e) {
+            console.error("Search inference failed:", e);
         }
-    } catch (e) {
-        console.error("Search inference failed:", e);
     }
 
     const timeAndLocationContext = `CURRENT TIME AND LOCATION:\n${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})\n\n`;
