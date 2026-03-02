@@ -304,7 +304,7 @@ User's Latest Message: ${text}`;
                          `2. Be as concise as possible. Your final answer should not exceed 2000 characters.\n` +
                          `3. Provide source links in Markdown format [Title](URL) ONLY if you used SEARCH RESULTS. Do not invent links.\n` +
                          `4. Be brief and direct. Answer in a natural, conversational tone.\n` +
-                         `5. If the user asks for the current time or date, answer naturally based on the CURRENT TIME AND LOCATION (e.g., "Сейчас 10:32 в White Rock").`;
+                         `5. If the user asks for the current time or date, answer naturally based on the CURRENT TIME AND LOCATION, and you MUST include the city name (e.g., "Сейчас 10:32 утра в White Rock").`;
     
     try {
         if (provider === 'gemini') {

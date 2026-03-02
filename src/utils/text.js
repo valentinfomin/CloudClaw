@@ -54,33 +54,19 @@ export function getFormattedTimestamp(timezone = 'UTC') {
     const now = new Date();
     
     try {
-        const formatter = new Intl.DateTimeFormat('en-CA', { 
+        const formatter = new Intl.DateTimeFormat('en-US', { 
             timeZone: timezone,
+            weekday: 'long',
             year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
+            month: 'long',
+            day: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit',
-            hour12: false,
-            timeZoneName: 'longOffset'
+            hour12: true,
+            timeZoneName: 'short'
         });
         
-        const parts = formatter.formatToParts(now);
-        const map = new Map(parts.map(p => [p.type, p.value]));
-        
-        // YYYY-MM-DDTHH:MM:SS
-        const isoWithoutOffset = `${map.get('year')}-${map.get('month')}-${map.get('day')}T${map.get('hour')}:${map.get('minute')}:${map.get('second')}`;
-        
-        // longOffset is "GMT-05:00" or "GMT+03:00" or "UTC"
-        let offset = map.get('timeZoneName');
-        if (offset === 'UTC' || offset === 'GMT') {
-            offset = 'Z';
-        } else {
-            offset = offset.replace('GMT', '').replace('UTC', '');
-        }
-        
-        return isoWithoutOffset + offset;
+        return formatter.format(now);
     } catch (e) {
         console.error(`Invalid timezone '${timezone}'. Falling back to UTC.`, e);
         // Fallback to UTC if timezone is invalid
