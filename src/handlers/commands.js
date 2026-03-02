@@ -290,10 +290,7 @@ User's Latest Message: ${text}`;
         console.error("Search inference failed:", e);
     }
 
-    let timeAndLocationContext = "";
-    if (searchResultsContext !== "No search results available yet.") {
-        timeAndLocationContext = `CURRENT TIME AND LOCATION:\n${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})\n\n`;
-    }
+    const timeAndLocationContext = `CURRENT TIME AND LOCATION:\n${getFormattedTimestamp(effectiveTimezone)} (${effectiveCity}, ${effectiveCountry}, Timezone: ${effectiveTimezone})\n\n`;
 
     console.log('--- 4. Calling AI (Synthesizing Answer) ---');
     let botReply = '';
