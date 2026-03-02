@@ -1,10 +1,10 @@
 # Implementation Plan: Smart Reminders & Complex Task Scheduling
 
-## Phase 1: AI Task Extraction Engine
-- [ ] Task: Create `src/services/task_parser.js` with a function `parseTaskIntent(text, history)`.
-- [ ] Task: Implement LLM prompt in `task_parser.js` that outputs structured JSON for: `intent_detected`, `message`, `start_offset_ms`, `interval_ms`, `total_count`.
-- [ ] Task: Write unit tests in `test/task_parser.test.js` covering various languages and complex repetition scenarios.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: AI Task Extraction Engine' (Protocol in workflow.md)
+## Phase 1: AI Task Extraction Engine [checkpoint: 9d88c86]
+- [x] Task: Create `src/services/task_parser.js` with a function `parseTaskIntent(text, history)`. 9d88c86
+- [x] Task: Implement LLM prompt in `task_parser.js` that outputs structured JSON for: `intent_detected`, `message`, `start_offset_ms`, `interval_ms`, `total_count`. 9d88c86
+- [x] Task: Write unit tests in `test/task_parser.test.js` covering various languages and complex repetition scenarios. 9d88c86
+- [x] Task: Conductor - User Manual Verification 'Phase 1: AI Task Extraction Engine' (Protocol in workflow.md) 9d88c86
 
 ## Phase 2: Confirmation Flow & State Management
 - [ ] Task: Extend user settings or a temporary "pending_tasks" table/KV to store tasks awaiting confirmation.
