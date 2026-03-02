@@ -40,6 +40,11 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Fix false success in task creation and ensure D1 persistence with verified awaits and error handling.**
 *Link: [./tracks/d1_persistence_20260227/](./tracks/d1_persistence_20260227/)*
 
+---
+
+- [ ] **Track: Smart Reminders & Complex Task Scheduling using AI inference and recursive Cron handling.**
+*Link: [./tracks/smart_reminders_20260302/](./tracks/smart_reminders_20260302/)*
+
 
 
 
