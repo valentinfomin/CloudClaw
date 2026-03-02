@@ -1,4 +1,4 @@
-import { getPendingTasks, updateTaskStatus, handleTaskFailure, createTask } from '../db/tasks.js';
+import { getPendingTasks, updateTaskStatus, handleTaskFailure, createTaskVerified } from '../db/tasks.js';
 import { sendMessage } from '../services/telegram.js';
 import { runChat, PREFERRED_CHAT_MODELS } from '../services/ai.js';
 import { getChatHistory } from '../db/messages.js';
@@ -77,10 +77,21 @@ export async function executeTask(task, env) {
         await updateTaskStatus(env.DB, task.id, 'completed');
         console.log(`[Cron] Task ${task.id} completed successfully`);
 
-        // Handle recurring tasks
-        if (task.cron_rule) {
-            // Very simple recurrence for now: Just schedule it 24h later if rule is 'daily'
-            // A real cron parser would be better here, but this fulfills the 'Repeating Tasks' requirement.
+        // Handle repetitions (Smart Reminders)
+        if (task.remaining_count > 1 && task.interval_ms > 0) {
+            const nextSchedule = Date.now() + task.interval_ms;
+            await createTaskVerified(env.DB, {
+                user_id: task.user_id,
+                task_type: task.task_type,
+                payload: task.payload,
+                scheduled_at: nextSchedule,
+                remaining_count: task.remaining_count - 1,
+                interval_ms: task.interval_ms,
+                cron_rule: task.cron_rule
+            });
+            console.log(`[Cron] Task ${task.id} repeated, next in ${task.interval_ms}ms. Remaining: ${task.remaining_count - 1}`);
+        } else if (task.cron_rule) {
+            // Very simple recurrence for legacy cron rules
             let nextSchedule = 0;
             if (task.cron_rule === 'daily') {
                 nextSchedule = Date.now() + (24 * 60 * 60 * 1000);
@@ -89,7 +100,7 @@ export async function executeTask(task, env) {
             }
 
             if (nextSchedule > 0) {
-                 await createTask(env.DB, {
+                 await createTaskVerified(env.DB, {
                      user_id: task.user_id,
                      task_type: task.task_type,
                      payload: task.payload,

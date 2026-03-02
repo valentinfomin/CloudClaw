@@ -30,12 +30,12 @@ export async function createTask(db, task) {
  * @returns {Promise<import('@cloudflare/workers-types').D1Response>} - D1 response object
  */
 export async function createTaskVerified(db, task) {
-    const { user_id, task_type, payload, scheduled_at, cron_rule = null } = task;
+    const { user_id, task_type, payload, scheduled_at, cron_rule = null, remaining_count = 1, interval_ms = 0 } = task;
     const stmt = db.prepare(
-        `INSERT INTO tasks (user_id, task_type, payload, scheduled_at, cron_rule) 
-         VALUES (?, ?, ?, ?, ?)`
+        `INSERT INTO tasks (user_id, task_type, payload, scheduled_at, cron_rule, remaining_count, interval_ms) 
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
     );
-    return await stmt.bind(user_id, task_type, payload, scheduled_at, cron_rule).run();
+    return await stmt.bind(user_id, task_type, payload, scheduled_at, cron_rule, remaining_count, interval_ms).run();
 }
 
 /**
@@ -110,6 +110,19 @@ export async function savePendingTask(db, task) {
 export async function getPendingTask(db, id) {
     const stmt = db.prepare(`SELECT * FROM pending_tasks WHERE id = ?`);
     return await stmt.bind(id).first();
+}
+
+/**
+ * Retrieves the most recent pending task for a user
+ */
+export async function getLatestPendingTask(db, userId) {
+    const stmt = db.prepare(
+        `SELECT * FROM pending_tasks 
+         WHERE user_id = ? 
+         ORDER BY created_at DESC 
+         LIMIT 1`
+    );
+    return await stmt.bind(userId).first();
 }
 
 /**
