@@ -42,7 +42,7 @@ describe('Cron Handler', () => {
         // Wait for the promise passed to waitUntil to resolve to check side effects
         await mockCtx.waitUntil.mock.calls[0][0];
 
-        expect(TelegramService.sendMessage).toHaveBeenCalledWith('token', 'user1', 'Hello');
+        expect(TelegramService.sendMessage).toHaveBeenCalledWith('token', 'user1', 'Reminder: Hello');
         expect(TasksDB.updateTaskStatus).toHaveBeenCalledWith(mockEnv.DB, 1, 'completed');
     });
 

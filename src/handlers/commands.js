@@ -4,6 +4,7 @@ import { logMessage, getChatHistory } from '../db/messages.js';
 import { getFileInfo, downloadFile, sendMessage, sendChatAction } from '../services/telegram.js';
 import { uploadFile, getFile, uploadPdfForSearch } from '../services/storage.js';
 import { createFile, listFiles } from '../db/files.js';
+import { createTaskVerified } from '../db/tasks.js';
 import { 
     generateEmbedding, 
     runChat, 
@@ -514,6 +515,35 @@ async function handleCommand(c, chat_id, text, token) {
     } else if (text.startsWith('/get ')) {
         const fileId = text.split(' ')[1];
         reply = `Request to get file ID: ${fileId} received. (Feature pending)`;
+    } else if (text.startsWith('/remind ')) {
+        try {
+            // Format: /remind buy milk in 5m
+            const match = text.match(/\/remind\s+(.+)\s+in\s+(\d+)m/i);
+            if (!match) {
+                reply = "Usage: /remind <message> in <minutes>m (e.g., /remind buy milk in 5m)";
+            } else {
+                const reminderText = match[1].trim();
+                const minutes = parseInt(match[2]);
+                const scheduledAt = Date.now() + (minutes * 60 * 1000);
+
+                const result = await createTaskVerified(c.env.DB, {
+                    user_id: chat_id,
+                    task_type: 'reminder',
+                    payload: JSON.stringify({ text: reminderText }),
+                    scheduled_at: scheduledAt
+                });
+
+                if (result.success) {
+                    console.info("SQL Executed", result.meta);
+                    reply = `✅ Reminder set for ${minutes} minutes from now: "${reminderText}"`;
+                } else {
+                    reply = "DB error: Task creation failed to confirm.";
+                }
+            }
+        } catch (e) {
+            console.error("REMIND COMMAND ERROR:", e.message);
+            reply = `DB error: ${e.message}`;
+        }
     } else if (text.startsWith('/import ')) {
         try {
             const jsonString = text.substring(text.indexOf('{'));

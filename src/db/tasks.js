@@ -24,6 +24,21 @@ export async function createTask(db, task) {
 }
 
 /**
+ * Creates a new task and returns the full D1 result for verification.
+ * @param {import('@cloudflare/workers-types').D1Database} db - The D1 database binding
+ * @param {Object} task - Task details
+ * @returns {Promise<import('@cloudflare/workers-types').D1Response>} - D1 response object
+ */
+export async function createTaskVerified(db, task) {
+    const { user_id, task_type, payload, scheduled_at, cron_rule = null } = task;
+    const stmt = db.prepare(
+        `INSERT INTO tasks (user_id, task_type, payload, scheduled_at, cron_rule) 
+         VALUES (?, ?, ?, ?, ?)`
+    );
+    return await stmt.bind(user_id, task_type, payload, scheduled_at, cron_rule).run();
+}
+
+/**
  * Gets pending tasks that are due for execution
  * @param {import('@cloudflare/workers-types').D1Database} db - The D1 database binding
  * @param {number} [limit=50] - Max tasks to retrieve

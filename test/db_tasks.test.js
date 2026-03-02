@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createTask, getPendingTasks, updateTaskStatus, handleTaskFailure } from '../src/db/tasks.js';
+import { createTask, getPendingTasks, updateTaskStatus, handleTaskFailure, createTaskVerified } from '../src/db/tasks.js';
 
 describe('Tasks Database Module', () => {
     let mockDb;
@@ -8,7 +8,7 @@ describe('Tasks Database Module', () => {
     beforeEach(() => {
         mockStmt = {
             bind: vi.fn().mockReturnThis(),
-            run: vi.fn().mockResolvedValue({ meta: { last_row_id: 1 } }),
+            run: vi.fn().mockResolvedValue({ success: true, meta: { last_row_id: 1, changes: 1 } }),
             all: vi.fn().mockResolvedValue({ results: [{ id: 1, status: 'pending' }] })
         };
         mockDb = {
@@ -29,6 +29,29 @@ describe('Tasks Database Module', () => {
         expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO tasks'));
         expect(mockStmt.bind).toHaveBeenCalledWith('user123', 'reminder', '{"text": "hello"}', 1000, null);
         expect(id).toBe(1);
+    });
+
+    it('createTaskVerified should insert a task and return the full result', async () => {
+        const task = {
+            user_id: 'user123',
+            task_type: 'reminder',
+            payload: '{"text": "hello"}',
+            scheduled_at: 1000
+        };
+
+        const result = await createTaskVerified(mockDb, task);
+        
+        expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO tasks'));
+        expect(mockStmt.bind).toHaveBeenCalledWith('user123', 'reminder', '{"text": "hello"}', 1000, null);
+        expect(result.success).toBe(true);
+        expect(result.meta.last_row_id).toBe(1);
+    });
+
+    it('createTaskVerified should propagate database errors', async () => {
+        const task = { user_id: 'u', task_type: 't', scheduled_at: 0 };
+        mockStmt.run.mockRejectedValue(new Error('D1 ERROR'));
+
+        await expect(createTaskVerified(mockDb, task)).rejects.toThrow('D1 ERROR');
     });
 
     it('getPendingTasks should retrieve tasks due for execution', async () => {
