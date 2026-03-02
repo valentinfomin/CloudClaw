@@ -13,11 +13,11 @@
 - [x] Task: Write integration tests for the "Detection -> Confirmation -> D1 Write" flow. c3bc225
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Confirmation Flow & State Management' (Protocol in workflow.md) c3bc225
 
-## Phase 3: Recursive Task Execution
-- [ ] Task: Update the `tasks` table schema in D1 to include `remaining_count` and `interval_ms` (via migration).
-- [ ] Task: Update `src/handlers/cron.js` to handle repetition logic: if `remaining_count > 1`, decrement and reschedule.
-- [ ] Task: Write tests for the recursive scheduling logic in `test/cron_repetition.test.js`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Recursive Task Execution' (Protocol in workflow.md)
+## Phase 3: Recursive Task Execution [checkpoint: e1e19ea]
+- [x] Task: Update the `tasks` table schema in D1 to include `remaining_count` and `interval_ms` (via migration). 80a66d8
+- [x] Task: Update `src/handlers/cron.js` to handle repetition logic: if `remaining_count > 1`, decrement and reschedule. 80a66d8
+- [x] Task: Write tests for the recursive scheduling logic in `test/cron_repetition.test.js`. 80a66d8
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Recursive Task Execution' (Protocol in workflow.md) e1e19ea
 
 ## Phase 4: Finalization
 - [ ] Task: Deploy the updated worker to production.
