@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createTask, getPendingTasks, updateTaskStatus, handleTaskFailure, createTaskVerified } from '../src/db/tasks.js';
+import { createTask, getPendingTasks, updateTaskStatus, handleTaskFailure, createTaskVerified, savePendingTask, getPendingTask, deletePendingTask } from '../src/db/tasks.js';
 
 describe('Tasks Database Module', () => {
     let mockDb;
@@ -82,5 +82,32 @@ describe('Tasks Database Module', () => {
         
         expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('UPDATE tasks SET status = ?'));
         expect(mockStmt.bind).toHaveBeenCalledWith('failed', 1);
+    });
+
+    it('savePendingTask should insert into pending_tasks', async () => {
+        const task = {
+            id: 'uuid',
+            user_id: 'u1',
+            task_type: 'reminder',
+            payload: '{}',
+            start_offset_ms: 0,
+            interval_ms: 0,
+            total_count: 1
+        };
+
+        await savePendingTask(mockDb, task);
+        expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO pending_tasks'));
+        expect(mockStmt.bind).toHaveBeenCalledWith('uuid', 'u1', 'reminder', '{}', 0, 0, 1);
+    });
+
+    it('getPendingTask should retrieve by id', async () => {
+        mockStmt.first = vi.fn().mockResolvedValue({ id: 'uuid' });
+        const result = await getPendingTask(mockDb, 'uuid');
+        expect(result.id).toBe('uuid');
+    });
+
+    it('deletePendingTask should delete by id', async () => {
+        await deletePendingTask(mockDb, 'uuid');
+        expect(mockDb.prepare).toHaveBeenCalledWith(expect.stringContaining('DELETE FROM pending_tasks'));
     });
 });

@@ -91,3 +91,31 @@ export async function handleTaskFailure(db, id, retry_count, max_retries, retryD
         await updateTaskStatus(db, id, 'failed');
     }
 }
+
+/**
+ * Saves a task awaiting user confirmation
+ */
+export async function savePendingTask(db, task) {
+    const { id, user_id, task_type, payload, start_offset_ms, interval_ms, total_count } = task;
+    const stmt = db.prepare(
+        `INSERT INTO pending_tasks (id, user_id, task_type, payload, start_offset_ms, interval_ms, total_count) 
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
+    );
+    await stmt.bind(id, user_id, task_type, payload, start_offset_ms, interval_ms, total_count).run();
+}
+
+/**
+ * Retrieves a pending task by ID
+ */
+export async function getPendingTask(db, id) {
+    const stmt = db.prepare(`SELECT * FROM pending_tasks WHERE id = ?`);
+    return await stmt.bind(id).first();
+}
+
+/**
+ * Deletes a pending task by ID
+ */
+export async function deletePendingTask(db, id) {
+    await db.prepare(`DELETE FROM pending_tasks WHERE id = ?`).bind(id).run();
+}
+
