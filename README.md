@@ -15,16 +15,15 @@ CloudClaw is a highly responsive AI agent deployed on Cloudflare Workers, adheri
 - **File Handling:** Securely manages user-uploaded files (PDFs, Images, Voice) in Cloudflare R2.
 - **Dynamic Model Selection:** Automatically routes queries between Cloudflare Workers AI and Google Gemini for optimal performance and detail.
 
-## 🛠 Installation Guide
+## 🛠 Automated Installation
 
-Follow these steps to get your own CloudClaw instance running.
+Follow these steps to deploy your own CloudClaw instance to Cloudflare.
 
 ### 1. Prerequisites
-- [Node.js](https://nodejs.org/) installed on your machine.
+- [Node.js](https://nodejs.org/) installed.
 - A [Cloudflare Account](https://dash.cloudflare.com/) with Workers, D1, R2, and Vectorize enabled.
-- A [Telegram Bot Token](https://core.telegram.org/bots/tutorial#6-pasting-your-api-token) from BotFather.
-- (Optional) [Tavily API Key](https://tavily.com/) for web search.
-- (Optional) [Google Gemini API Key](https://aistudio.google.com/) for advanced image analysis.
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed and logged in (`npx wrangler login`).
+- A [Telegram Bot Token](https://core.telegram.org/bots/tutorial#6-pasting-your-api-token) from @BotFather.
 
 ### 2. Clone the Repository
 ```bash
@@ -32,69 +31,26 @@ git clone https://github.com/valentinfomin/CloudClaw.git
 cd CloudClaw
 ```
 
-### 3. Install Dependencies
-```bash
-npm install
-```
-
-### 4. Initialize Cloudflare Resources
-You need to create the required D1 Database, R2 Buckets, and Vectorize Index as defined in `wrangler.toml`.
+### 3. Run the Setup Script
+The automated setup script will create your D1 database, R2 buckets, and Vectorize index, apply migrations, and prompt you for your secrets.
 
 ```bash
-# Create D1 Database
-npx wrangler d1 create cloudclaw-db
-
-# Create R2 Buckets
-npx wrangler r2 bucket create cloudclaw-storage
-npx wrangler r2 bucket create cloudclaw-ai-search
-
-# Create Vectorize Index (Dimension 768 for BGE-base)
-npx wrangler vectorize create cloudclaw-index --dimensions=768 --metric=cosine
+chmod +x scripts/setup.sh
+./scripts/setup.sh
 ```
 
-Update your `wrangler.toml` with the generated `database_id`.
-
-### 5. Apply Database Migrations
-```bash
-# Apply migrations to local development database
-npx wrangler d1 migrations apply cloudclaw-db --local
-
-# Apply migrations to production database
-npx wrangler d1 migrations apply cloudclaw-db --remote
-```
-
-### 6. Configure Secrets
-Set the following secrets for your production environment:
+### 4. Set the Telegram Webhook
+After the deployment is complete, link your Telegram bot to your new worker:
 
 ```bash
-npx wrangler secret put TG_TOKEN         # Your Telegram Bot Token
-npx wrangler secret put TAVILY_API_KEY   # (Optional)
-npx wrangler secret put GEMINI_API_KEY   # (Optional)
-```
-
-For local development, create a `.dev.vars` file in the root directory:
-```
-TG_TOKEN=your_telegram_token
-TAVILY_API_KEY=your_tavily_key
-GEMINI_API_KEY=your_gemini_key
-```
-
-### 7. Deploy to Cloudflare
-```bash
-npm run deploy
-```
-
-### 8. Set Telegram Webhook
-Run the provided script to link your Telegram bot to your deployed worker:
-```bash
-# Replace <YOUR_WORKER_URL> with your actual deployment URL
+# Replace <YOUR_WORKER_URL> with the URL provided by wrangler (e.g., https://cloudclaw-agent.user.workers.dev)
 ./scripts/set_webhook.sh <YOUR_WORKER_URL>/webhook
 ```
 
 ## 📖 Usage
 Once deployed, simply start a conversation with your bot on Telegram.
-- Send messages to chat.
+- Send messages to chat naturally.
 - Upload PDFs to index them for search.
-- Upload images for analysis.
-- Use `/remind [task] in [X]m` or natural language like "remind me to check mail in 1 hour" to schedule tasks.
+- Upload images for analysis and OCR.
+- Use natural language like "remind me to check mail in 1 hour" or "remind me every 2 minutes 3 times" to schedule tasks.
 - Use `/toggle_gemini` to switch between Cloudflare AI and Google Gemini providers.
